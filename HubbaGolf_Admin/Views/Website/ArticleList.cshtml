@@ -1,0 +1,85 @@
+﻿@using HubbaGolfAdmin.Database.Dtos
+@using HubbaGolfAdmin.Shared
+@model List<ArticleDto>
+
+@section Styles {
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+}
+<div class="page-heading">
+    <div class="page-title">
+        <h3></h3>
+    </div>
+    <section class="section">
+        <div class="card">
+            <div class="card-body">
+                <form class="input-group" asp-action="SearchArticle" asp-controller="website">
+                    <input class="form-control" placeholder="Search by title or summary..." type="text" id="txt_Search" name="value">
+                    <button type="submit" class="btn btn-primary">
+                        <span class="fa-fw select-all fas"></span>
+                        Search
+                    </button>
+                    <!--CategoryId-->
+                    <input type="hidden" name="id" id="txt_CategoryId" value="@((int)(ViewBag.CategoryId ?? 0))" />
+                </form>
+                <hr />
+                <table class="table table-striped breakspace" id="table">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Title</th>
+                            <th>Summary</th>
+                            <th>Author</th>
+                            <th>CreatedOn</th>
+                            <th>Publish</th>
+                            <th class="text-end text-nowrap">
+                                <a class="btn btn-outline-primary" asp-action="GetArticleByIdAdmin" asp-controller="Website" asp-route-id="0">
+                                    <span class="fa-fw select-all fas"></span>
+                                    Add new
+                                </a>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            if (Model != null)
+                            {
+                                var zNo = 1;
+                                foreach (var item in Model)
+                                {
+                                    <tr id="@item.Id">
+                                        <td style="width:7%">
+                                            <input type="text" class="form-control" value="@item.Rank"/>
+                                        </td>
+                                        <td>@item.Title</td>
+                                        <td>@item.Summary</td>
+                                        <td>@item.Author</td>
+                                        <td>@item.CreatedOn?.ToString("dd/MM/yyyy")</td>
+                                        <td>
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="chk_Status" name="Status" edit-id="@item.Id" @(item?.Status == 1 ? "checked" : "")>
+                                            </div>
+                                        </td>
+                                        <td class="text-end text-nowrap">
+                                            <a class="btn btn-outline-primary" asp-action="GetArticleByIdAdmin" asp-controller="Website" asp-route-id="@item?.Id">
+                                                <i class="bi bi-pencil-square"></i>
+                                                Update
+                                            </a>
+                                            <a class="btn btn-outline-danger" delete-id="@item?.Id">
+                                                <i class="bi bi-trash"></i>
+                                                Delete
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+</div>
+@section Scripts {
+    <script src="~/assets/extensions/toastify-js/src/toastify.js"></script>
+    <script src="~/js/page/articlelist.js" asp-append-version="true"></script>
+}

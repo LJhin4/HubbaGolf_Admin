@@ -1,0 +1,265 @@
+﻿@using HubbaGolfAdmin.Database
+@using HubbaGolfAdmin.Database.Dtos
+@using HubbaGolfAdmin.Database.Models
+@using HubbaGolfAdmin.Services.Implements
+@using HubbaGolfAdmin.Shared
+@inject EnvironmentService EnvService
+@model ArticleDto
+@{
+    var _ListCates = new List<CategoryDto>();
+    var _ListParentCates = new List<CategoryDto>();
+    if (ViewBag.SelectCategory != null)
+    {
+        _ListCates = ViewBag.SelectCategory as List<CategoryDto>;
+        _ListParentCates = _ListCates?.Where(s => s.Parent == 0).ToList();
+    }
+
+    //The default is normal posts
+    var _TypeArticle = TypeArticle.IsArticle;
+    if (ViewBag.TypeOfArticle != null)
+    {
+        _TypeArticle = ViewBag.TypeOfArticle;
+    }
+
+    var _CategoryId = 0;
+    if (ViewBag.CategoryId != null)
+    {
+        _CategoryId = ViewBag.CategoryId;
+    }
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/assets/extensions/filepond/filepond.css">
+    <link rel="stylesheet" href="~/assets/extensions/filepond-plugin-image-preview/filepond-plugin-image-preview.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
+    <style>
+        .bg-tab {
+            background: #f2f7ff
+        }
+    </style>
+}
+<div class="page-heading">
+    <div class="page-title">
+        <h3>Article information</h3>
+    </div>
+
+    <section class="section">
+        <form class="form form-vertical" method="post" enctype="multipart/form-data" id="frmPost">
+            <div class="row">
+                <div class="col-9">
+                    <div class="card">
+                        <div class="card-body">
+                            <ul class="nav nav-tabs" id="articleTab" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link active" id="article-vn-tab"
+                                       data-bs-toggle="tab"
+                                       href="#article-vn"
+                                       role="tab"
+                                       aria-controls="home"
+                                       aria-selected="true">Detail</a>
+                                </li>
+                                @* <li class="nav-item" role="presentation">
+                                    <a class="nav-link" id="article-en-tab"
+                                       data-bs-toggle="tab"
+                                       href="#article-en"
+                                       role="tab"
+                                       aria-controls="home"
+                                       aria-selected="true">English</a>
+                                </li> *@
+                            </ul>
+                            <div class="tab-content" id="articleTabContent">
+
+                                <!--vietnamese-->
+                                <div class="tab-pane fade show active p-3 rounded bg-tab" id="article-vn" role="tabpanel" aria-labelledby="article-vn-tab">
+
+                                    <div class="form-group">
+                                        <label for="txt_TitleVn">Title</label>
+                                        <input type="text" id="txt_TitleVn" class="form-control required" name="Title" value="@(Model?.Title ?? "")" maxlength="500">
+                                    </div>
+
+                                    <div class="form-group d-none">
+                                        <label for="txt_MetaTitle">Unsigned title</label>
+                                        <input type="text" id="txt_MetaTitle" class="form-control" name="MetaTitle" value="@(Model?.MetaTitle ?? "")">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="txt_SummaryVn">Summary content</label>
+                                        <textarea id="txt_SummaryVn" rows="7" class="form-control" name="Summary" maxlength="500">@(Model?.Summary ?? "")</textarea>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="txt_ContentVn">Content</label>
+                                        <textarea id="txt_ContentVn" class="tiny-editor required" rows="12" name="Content">@Html.Raw(Model?.Content ?? "")</textarea>
+                                    </div>
+                                </div>
+
+                                <!--english-->
+                                @* <div class="tab-pane fade p-3 rounded bg-tab" id="article-en" role="tabpanel" aria-labelledby="article-en-tab">
+                                    
+                                </div> *@
+                            </div>
+
+                            <div class="row">
+                                <div class="col-12">
+                                    <select class="form-select" id="cbo_Link" name="Link">
+                                    </select>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="card-footer d-flex justify-content-center">
+                            <a asp-controller="Website" asp-action="GetListArticleByCategoryIdAdmin" asp-route-id="@ViewBag.CategoryId" class="btn btn-secondary me-2">
+                                <span class="fa-fw select-all fas"></span>
+                                Back
+                            </a>
+                            <button type="button" class="btn btn-primary" id="btn_Save">
+                                <span class="fa-fw select-all fas"></span>
+                                Update
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="card mb-2">
+                        <div class="card-body">
+
+                            <h4 class="card-title">Setting</h4>
+                            <h6 class="card-subtitle">Supporting information</h6>
+                            <hr />
+
+                            <div class="form-group">
+                                <label for="txt_UrlImage" class="form-label">Avatar</label>
+
+                                @{
+                                    if (Model != null && !string.IsNullOrEmpty(Model?.UrlImage))
+                                    {
+                                        var zSrc = Url.Content(EnvService.GetUrl(Model?.UrlImage));
+                                        <img src="@Url.Content(zSrc)" class="w-100" />
+                                    }
+                                }
+
+                                <!-- File uploader -->
+                                <input type="file" id="txt_UrlImage" name="FileImage" class="basic-filepond" accept="image/jpeg, image/png, image/svg">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="txt_Icon" class="form-label">Icon (if any)</label>
+
+                                @{
+                                    if (Model != null && !string.IsNullOrEmpty(Model?.Icon))
+                                    {
+                                        var zSrc = Url.Content(EnvService.GetUrl(Model?.Icon));
+                                        <img src="@Url.Content(zSrc)" class="w-100" />
+                                    }
+                                }
+
+                                <!-- File uploader -->
+                                <input type="file" id="txt_Icon" name="FileIcon" class="basic-filepond" accept="image/jpeg, image/png, image/svg">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="txt_TagID">TagID</label>
+                                <input type="text" id="txt_TagID" class="form-control" name="TagID" value="@(Model?.TagId ?? "")">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="cbo_Category">Category</label>
+                                <select class="form-select select2" id="cbo_Category" name="CategoryID" disabled>
+                                    <option value="">Choose...</option>
+                                    @{
+                                        foreach (var item in _ListParentCates)
+                                        {
+                                            var zChildCategory = _ListCates.Where(s => s.Parent == item.Id).ToList();
+                                            <optgroup value="@item.Id" label="@item.Name">
+                                                @{
+                                                    foreach (var i in zChildCategory)
+                                                    {
+                                                        if (Model != null && Model?.CategoryId == i.Id || (int)ViewBag.CategoryId == i.Id)
+                                                        {
+                                                            <option value="@i.Id" selected>@i.Name</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="@i.Id">@i.Name</option>
+                                                        }
+                                                    }
+                                                }
+                                            </optgroup>
+                                        }
+                                    }
+                                </select>
+                            </div>
+
+                            @if (_TypeArticle == TypeArticle.IsCarrier)
+                            {
+                                var dateExp = Model?.DateExp;
+                                if (!dateExp.HasValue)
+                                    dateExp = DateTime.Now;
+
+                                <div class="form-group">
+                                    <label for="txt_DateExp">Recruitment deadline date</label>
+                                    <input type="text" id="txt_DateExp"
+                                           class="form-control datetimepicker required" name="DateExp"
+                                           value="@dateExp?.ToString("dd/MM/yyyy")">
+                                </div>
+                            }
+
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="chk_Status" name="Status" @(Model?.Status == 1 ? "checked" : "")>
+                                <label class="form-check-label" for="chk_Status">
+                                    Publish
+                                </label>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">Update history</h4>
+                            @* @{
+                                if (ViewBag.Log != null)
+                                {
+                                    var logs = ViewBag.Log as List<UsersSysLog>;
+                                    <ul>
+                                        @foreach (var item in logs)
+                                        {
+                                            var createdOn = item.CreatedOn?.ToString("dd/MM/yyyy HH:mm:ss");
+                                            var createdName = item.CreatedName;
+
+                                            <li>
+                                                <a href="#" onclick="openLog(@item.InputInfo, '@createdOn', '@createdName')">
+                                                    @createdOn |
+                                                    @createdName
+                                                </a>
+                                            </li>
+                                        }
+                                    </ul>
+                                }
+                            } *@
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--hidden id-->
+            <input type="hidden" id="txt_ID" name="ID" value="@(Model != null && Model?.Id>0?Model?.Id:0)" />
+            <input type="hidden" id="txt_Status" name="HiddenStatus" />
+            <input type="hidden" id="txt_TypeArticle" value="@_TypeArticle" />
+            <input type="hidden" id="txt_HasImage" value="@Model?.UrlImage" />
+            <input type="hidden" id="txt_Link" value="@Model?.Link" />
+
+        </form>
+    </section>
+</div>
+
+@section Scripts {
+    <script src="~/assets/extensions/filepond-plugin-file-validate-size/filepond-plugin-file-validate-size.min.js"></script>
+    <script src="~/assets/extensions/filepond-plugin-file-validate-type/filepond-plugin-file-validate-type.min.js"></script>
+    <script src="~/assets/extensions/filepond-plugin-image-preview/filepond-plugin-image-preview.min.js"></script>
+    <script src="~/assets/extensions/filepond-plugin-image-rename/filepond-plugin-image-rename.js"></script>
+
+    <script src="~/assets/extensions/filepond/filepond.js"></script>
+    <script src="~/assets/extensions/tinymce/tinymce.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="~/js/remove-all-diacritics.js"></script>
+    <script src="~/js/page/articleedit.js" asp-append-version="true"></script>
+}

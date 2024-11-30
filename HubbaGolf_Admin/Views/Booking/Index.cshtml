@@ -1,0 +1,319 @@
+﻿@using Newtonsoft.Json;
+@using HubbaGolfAdmin.Database.Models;
+@model List<Events>
+
+<script>
+    let calendar;
+    document.addEventListener('DOMContentLoaded', function () {
+        var calendarEl = document.getElementById('demo-content');
+        calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: '' //dayGridMonth,timeGridWeek,timeGridDay,listMonth
+            },
+            editable: true,
+            timeZone: 'local',
+            eventResizableFromStart: true,
+            dayMaxEventRows: 5,
+            moreLinkClick: 'popover',
+            height: 'auto',
+            events: [
+                    @foreach (var ev in Model)
+                    {
+                        var startDate = ev.StartDate == null ? "" : ev.StartDate.Value.ToString("yyyy-MM-ddTHH:mm:ss");
+                        var endDate = ev.EndDate == null ? "" : ev.EndDate.Value.ToString("yyyy-MM-ddTHH:mm:ss");
+                        <text>
+                                    {
+                                        id: '@ev.Id',
+                                        title: '@ev.Title',
+                                        start: '@startDate',
+                                        end: '@endDate',
+                                        allDay: '@ev.IsAllDay' === "True" ? true : false,
+                                        description: '@ev.Description'
+                                    },
+                        </text>
+                    }
+                    ],
+            eventDrop: function (info) {
+                updateEvent(info.event);
+            },
+            eventResize: function (info) {
+                if (confirm("Are you sure?")) {
+                    updateEvent(info.event);
+                } else {
+                    info.revert();
+                }
+            },
+            eventClick: function (info) {
+                // Populate modal with event details
+                document.getElementById('eventTitle').innerText = info.event.title;
+                document.getElementById('eventStart').innerText = info.event.start.toLocaleString();
+                document.getElementById('eventEnd').innerText = info.event.end ? info.event.end.toLocaleString() : 'N/A';
+                document.getElementById('eventDescription').innerText = info.event.extendedProps.description;
+
+                // Open the modal
+                $('#eventInfoModal').modal('show');
+            }
+        });
+        calendar.render();
+
+        function updateEvent(event) {
+            $.ajax({
+                url: '/Booking/UpdateEvent',
+                type: 'POST',
+                data: {
+                    id: event.id,
+                    start: event.start.toLocaleString(),
+                    end: event.end ? event.end.toLocaleString() : null
+                },
+                success: function () {
+                    location.reload();
+                    // Utils.showAlertSuccess('Success', 'Update success.')
+                },
+                error: function () {
+                    Utils.showAlertError('Error', 'Update failed');
+                }
+            });
+        }
+    });
+</script>
+
+<div class="row" id="rowresize">
+    <div class="col-md-auto">
+        <h1>Calendar</h1>
+    </div>
+    <div class="col">
+        <div class="d-flex justify-content-end pt-2">
+            @* <button class="btn btn-primary ms-1" id="btnAddEvent">
+                Booking
+            </button> *@
+            <a class="btn btn-primary ms-1" asp-controller="Booking" asp-action="New">
+                Booking
+            </a>
+        </div>
+    </div>
+</div>
+<div class="row flex-grow-1" id="calendar-container">
+    <div class="col-9 main-content flex-grow-1 d-flex flex-column">
+        <div class="card mb-2 flex-grow-1">
+            <div class="card-body flex-grow-1 d-flex flex-column p-0">
+                <div class="container flex-grow-1 d-flex flex-column pt-1">
+                    <!-- Nav tabs -->
+                    <ul class="nav nav-tabs" id="previewTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link active" id="drafteco-tab" data-bs-toggle="tab" href="#drafteco" role="tab" aria-controls="drafteco" aria-selected="true">List</a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" id="draftemail-tab" data-bs-toggle="tab" href="#draftemail" role="tab" aria-controls="draftemail" aria-selected="false">Calendar</a>
+                        </li>
+                    </ul>
+
+                    <!-- Tab panes -->
+                    <div class="tab-content flex-grow-1" style="height: 100px;overflow-y: auto;">
+                        <div class="tab-pane fade show active" id="drafteco" role="tabpanel" aria-labelledby="drafteco-tab">
+                            <div class="container pt-4 table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>OrderNumber</th>
+                                            <th>Name</th>
+                                            <th>Phone</th>
+                                            <th>Email</th>
+                                            <th>PlayerNumber</th>
+                                            <th>StartDate</th>
+                                            <th>EndDate</th>
+                                            <th>#</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            int No = 1;
+                                            foreach (var item in Model)
+                                            {
+                                                <tr>
+                                                    <td>@(No++)</td>
+                                                    <td>@item.OrderNumber</td>
+                                                    <td>@item.Name</td>
+                                                    <td>@item.Phone</td>
+                                                    <td>@item.Email</td>
+                                                    <td>@item.PlayerNumber</td>
+                                                    <td>@(item.StartDate?.ToString("hh:mm tt MM/dd/yyyy") ?? "")</td>
+                                                    <td>@(item.EndDate?.ToString("hh:mm tt MM/dd/yyyy") ?? "")</td>
+                                                    <td style="white-space: nowrap;">
+                                                        <a class="btn btn-outline-primary" asp-controller="Booking" asp-action="GetInfo" asp-route-id="@item.Id">
+                                                            Detail
+                                                        </a>
+                                                        <a class="btn btn-outline-danger" delete-id="@item.Id">
+                                                            <i class="bi bi-trash"></i>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="draftemail" role="tabpanel" aria-labelledby="draftemail-tab">
+                            <div class="container pt-4" id="calendar-container">
+                                <div class='demos__main'>
+                                    <div class='demos__main-container' id='demo-content'>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@* <!--Modal info event-->
+<div class="modal" tabindex="-1" id="eventInfoModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="eventTitle"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="closeInfo">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Start:</strong> <span id="eventStart"></span></p>
+                <p><strong>End:</strong> <span id="eventEnd"></span></p>
+                <p><strong>Description:</strong> <span id="eventDescription"></span></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" id="btnCloseInfo">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal add event-->
+<div class="modal" tabindex="-1" id="eventAddModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="eventTitle">Add Event</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="closeAdd">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Title</label>
+                    <input id="Title" class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <input id="Description" class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label>StartDate</label>
+                    <input type="text" id="StartDate" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label>EndDate</label>
+                    <input type="text" id="EndDate" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label>Location</label>
+                    <input id="Location" class="form-control" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="btnSaveEvent" class="btn btn-primary">Save</button>
+            </div>
+        </div>
+    </div>
+</div> *@
+
+<script>
+    const calendarContainer = document.getElementById('calendar-container');
+    const rowResize = document.getElementById('rowresize');
+    // Use ResizeObserver
+    const resizeObserver = new ResizeObserver(() => {
+        if (calendar) {
+            calendar.updateSize(); // Call updateSize() when the size changes
+        }
+    });
+
+    // Tracks the element's size changes
+    resizeObserver.observe(calendarContainer);
+    resizeObserver.observe(rowResize);
+
+    $(document).ready(function () {
+        const previewTab = $('#previewTab'); // Get the list of tabs
+
+        // 1. Restore tab state from localStorage
+        const activeTab = localStorage.getItem('activeTab') || '#drafteco'; // Default is the first tab
+        $(`[href="${activeTab}"]`).tab('show'); // Activate the saved tab
+
+        // 2. Handling when switching tabs
+        previewTab.on('shown.bs.tab', 'a[data-bs-toggle="tab"]', function (e) {
+            const targetTab = $(e.target).attr('href'); // Get the currently selected tab ID
+            localStorage.setItem('activeTab', targetTab); // Save tab state to localStorage
+        });
+    });
+
+    $('a[delete-id]').on('click', function (event) {
+        var id = $(this).attr("delete-id");
+        var row = $(this).closest('tr');
+        $.confirm(Utils.createConfirmDialog('red', 'Notify!', 'Are you sure?',
+            function () {
+                DeleteEvent(id, function (success) {
+                    if (success) {
+                        // row.css('background-color', '#FF5733').fadeOut(500, function () {
+                        //     row.remove();
+                        // });
+                        location.reload();
+                    } else {
+                        $.alert('Failed to delete the event. Please try again.');
+                    }
+                });
+            }));
+    });
+
+    function DeleteEvent(id, callback) {
+        $.ajax({
+            type: "POST",
+            url: "/Booking/DeleteEvent",
+            data: {
+                id: id
+            },
+            beforeSend: function (xhr) {
+
+            },
+            success: function (r) {
+                if (r.success) {
+                    callback(true);
+
+                } else {
+                    Utils.showAlertError('Error!', r.message);
+                }
+            },
+            error: function (e) {
+
+            },
+            complete: function (e) {
+
+            }
+        });
+    }
+
+    document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
+        tab.addEventListener("shown.bs.tab", function (e) {
+            if (calendar) {
+                calendar.updateSize();
+            }
+        });
+    });
+</script>

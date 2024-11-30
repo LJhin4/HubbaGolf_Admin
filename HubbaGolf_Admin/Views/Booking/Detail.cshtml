@@ -1,0 +1,179 @@
+﻿@using Newtonsoft.Json;
+@using HubbaGolfAdmin.Database.Models;
+@model Events
+
+<div>
+    <div class="form-group">
+        <label>Name</label>
+        <input id="Name" class="form-control" value="@Model.Name"/>
+    </div>
+
+    <div class="form-group">
+        <label>Phone</label>
+        <input id="Phone" class="form-control" value="@Model.Phone" />
+    </div>
+
+    <div class="form-group">
+        <label>Email</label>
+        <input id="Email" class="form-control" value="@Model.Email" />
+    </div>
+
+    <div class="form-group">
+        <label>StartDate</label>
+        <input type="text" id="StartDate" class="form-control" value="@(Model.StartDate?.ToString("hh:mm tt MM/dd/yyyy") ?? "")">
+    </div>
+
+    <div class="form-group">
+        <label>EndDate</label>
+        <input type="text" id="EndDate" class="form-control" value="@(Model.EndDate?.ToString("hh:mm tt MM/dd/yyyy") ?? "")">
+    </div>
+
+    <div class="form-group">
+        <label>Players</label>
+        <input id="PlayerNumber" type="number" class="form-control" value=@Model.PlayerNumber />
+    </div>
+
+    <div class="form-group">
+        <label>Country</label>
+        <select id="Country" class="form-control">
+            <option value="">-- Select Country --</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Course</label>
+        <input id="Course" type="text" class="form-control" value="@Model.Course"/>
+    </div>
+
+    @* <div class="form-group">
+    <label>IsAllDay</label>
+    <div class="form-check pt-2">
+    <div class="form-check form-switch">
+    <input class="form-check-input toggle-checkbox" type="checkbox"
+    id="chkIsActive">
+    </div>
+    </div>
+    </div> *@
+
+    <div class="form-group row">
+        <div class="cold-md-auto" style="width: auto;">
+            <a asp-controller="Booking" asp-action="Index" class="btn btn-light ms-1">
+                <span class="fa-fw select-all fas"></span>
+                Back
+            </a>
+        </div>
+        <div class="col-md-auto" style="width: auto;">
+            <button id="btnSaveEvent" class="btn btn-primary">Update</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    var originalModel = @Html.Raw(JsonConvert.SerializeObject(@Model, new JsonSerializerSettings
+                   {
+                       ContractResolver = new Newtonsoft.Json.Serialization.DefaultContractResolver()
+                   }));
+
+    flatpickr("#StartDate", {
+        enableTime: true,
+        dateFormat: "h:i K m/d/Y",
+        time_24hr: false,
+    });
+
+    flatpickr("#EndDate", {
+        enableTime: true,
+        dateFormat: "h:i K m/d/Y",
+        time_24hr: false,
+    });
+
+    $(document).ready(function () {
+        $.ajax({
+            url: "https://restcountries.com/v3.1/all?fields=name,flags",
+            method: "GET",
+            success: function (data){
+                $('#Country').empty();
+
+                $.each(data, function (index, country) {
+                    $('#Country').append(
+                        $('<option>', {
+                            value: country.name.common,
+                            text: country.name.common
+                        })
+                    );
+                });
+
+                $("#Country").val(originalModel.Country);
+            },
+            error: function (xhr, status, error) {
+                console.error('Error fetching countries:', error);
+            }
+        });
+    });
+
+    $('#btnSaveEvent').click(function () {
+
+        // var startDateString = $('#StartDate').val();
+        // var [time, date] = startDateString.split(' ');
+        // var [hour, minute] = time.split(':');
+        // var [day, month, year] = date.split('/');
+        // var startDate = new Date(year, month - 1, day, hour, minute);
+        // var FromDate = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}T${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}:00`;
+
+        var startDateString = $('#StartDate').val();
+        var [time, ampm, date] = startDateString.split(' ');
+        var [hour, minute] = time.split(':');
+        var [month, day, year] = date.split('/');
+
+        if (ampm === "PM" && hour !== "12") {
+            hour = parseInt(hour) + 12;
+        } else if (ampm === "AM" && hour === "12") {
+            hour = 0;
+        }
+        var startDate = new Date(year, month - 1, day, hour, minute);
+        var FromDate = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}T${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}:00`;
+
+        var startDateString = $('#EndDate').val();
+        var [time, ampm, date] = startDateString.split(' ');
+        var [hour, minute] = time.split(':');
+        var [month, day, year] = date.split('/');
+
+        if (ampm === "PM" && hour !== "12") {
+            hour = parseInt(hour) + 12;
+        } else if (ampm === "AM" && hour === "12") {
+            hour = 0;
+        }
+        var endDate = new Date(year, month - 1, day, hour, minute);
+        var ToDate = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}T${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}:00`;
+
+        var updatedModel = JSON.parse(JSON.stringify(originalModel));
+
+        updatedModel.Name = $('#Name').val();
+        updatedModel.Phone = $('#Phone').val();
+        updatedModel.Email = $('#Email').val();
+        updatedModel.PlayerNumber = $('#PlayerNumber').val() === "" ? null : $('#PlayerNumber').val();
+        updatedModel.StartDate = FromDate;
+        updatedModel.EndDate = ToDate;
+        updatedModel.Country = $('#Country').val();
+        updatedModel.Course = $('#Course').val();
+
+        $.ajax({
+            url: "/Booking/UpdateFullInfoEvent",
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            data: JSON.stringify(updatedModel),
+            success: function (response) {
+                $('.loading-overlay').hide();
+                Utils.showAlertSuccess('Success', 'Add success.').then(function () {
+                    window.location.href = (window.location.hostname === "localhost" ? "" : "") + "/Booking/Index";
+                });
+            },
+            error: function (xhr, status, error) {
+                $('.loading-overlay').hide();
+                console.log(xhr.responseText);
+                Utils.showAlertError('Error', xhr.responseText);
+            },
+        });
+    })
+</script>

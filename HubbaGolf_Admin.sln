@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34728.123
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HubbaGolf_Admin", "HubbaGolf_Admin\HubbaGolf_Admin.csproj", "{F0ACA749-8DF8-40B1-AEF6-46CD1B2C234D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HubbaGolfAdmin.Database", "HubbaGolfAdmin.Database\HubbaGolfAdmin.Database.csproj", "{7FC076D3-9814-4C58-8D63-A4F76EAB1CD9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HubbaGolfAdmin.Services", "HubbaGolfAdmin.Services\HubbaGolfAdmin.Services.csproj", "{84CAC1D4-8647-4BC0-9AAC-38EDA9055A97}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HubbaGolfAdmin.Shared", "HubbaGolfAdmin.Shared\HubbaGolfAdmin.Shared.csproj", "{26F4CCED-D885-41DE-8BBB-DA376CB51F54}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F0ACA749-8DF8-40B1-AEF6-46CD1B2C234D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F0ACA749-8DF8-40B1-AEF6-46CD1B2C234D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F0ACA749-8DF8-40B1-AEF6-46CD1B2C234D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F0ACA749-8DF8-40B1-AEF6-46CD1B2C234D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7FC076D3-9814-4C58-8D63-A4F76EAB1CD9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7FC076D3-9814-4C58-8D63-A4F76EAB1CD9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7FC076D3-9814-4C58-8D63-A4F76EAB1CD9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7FC076D3-9814-4C58-8D63-A4F76EAB1CD9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84CAC1D4-8647-4BC0-9AAC-38EDA9055A97}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84CAC1D4-8647-4BC0-9AAC-38EDA9055A97}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84CAC1D4-8647-4BC0-9AAC-38EDA9055A97}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84CAC1D4-8647-4BC0-9AAC-38EDA9055A97}.Release|Any CPU.Build.0 = Release|Any CPU
+		{26F4CCED-D885-41DE-8BBB-DA376CB51F54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26F4CCED-D885-41DE-8BBB-DA376CB51F54}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26F4CCED-D885-41DE-8BBB-DA376CB51F54}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26F4CCED-D885-41DE-8BBB-DA376CB51F54}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5F8695F1-8369-40E7-9975-3BA53628F212}
+	EndGlobalSection
+EndGlobal

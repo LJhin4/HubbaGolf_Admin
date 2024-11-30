@@ -1,0 +1,321 @@
+﻿@inject IWebHostEnvironment _WebEnv
+@inject IConfiguration _Config
+@inject IHttpContextAccessor _Context
+@inject SessionStore _Session
+@inject DapperHelper _Dapper
+@using Microsoft.AspNetCore.Http.Extensions
+@using HubbaGolfAdmin.Database
+@using HubbaGolfAdmin.Database.Dtos
+@using HubbaGolfAdmin.Database.Models
+@model MenuViewModel
+@{
+    var zMenus = Model.MenuAdmin;
+    var zParentMenus = zMenus?.Where(r => r.Parent == 0);
+    var zCates = ConvertCatetoMenu(Model.MenuCategory);
+    var zParentCates = zCates?.Where(r => r.Parent == 0).OrderBy(r => r.Sort);
+    var zLocas = ConvertCatetoMenu(Model.MenuLocation);
+    var zParentLocas = zLocas?.Where(r => r.Parent == 0).OrderBy(r => r.Sort);
+}
+
+<div class="sidebar-menu">
+    <ul class="menu">
+        <li class="sidebar-title">Manage New</li>
+        @{
+            if(zParentCates != null)
+            {
+                foreach (var menu in zParentCates)
+                {
+                    var zSubCates = zCates.Where(r => r.Parent == menu.Id).OrderBy(r => r.Sort);
+                    var zActive = IsMenuActive(zSubCates);
+
+                    if (zSubCates.Count() > 0)
+                    {
+                        <li class="sidebar-item has-sub @(zActive ? "active" : "") ">
+                            <a href="#" class="sidebar-link">
+                                <i class="bi bi-circle"></i>
+                                <span>@menu.Name</span>
+                            </a>
+
+                            <ul class="submenu @(zActive ? "submenu-open" : "submenu-closed")">
+                                @{
+                                    foreach (var sub in zSubCates)
+                                    {
+                                        var zSubActive = IsSubMenuActive(sub);
+                                        var zAction = sub.Action;
+                                        var zController = sub.Controller;
+                                        var zParams = sub.Params;
+                                        var zName = sub.Name;
+                                        var zIcon = sub.Icon;
+
+                                        <li class="submenu-item @(zSubActive ? "active" : "")">
+                                            @{
+                                                if (!string.IsNullOrEmpty(sub.Params))
+                                                {
+                                                    <a asp-action="@zAction"
+                                                       asp-controller="@zController"
+                                                       asp-route-id="@zParams" class="submenu-link">
+                                                        @zName
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <a asp-action="@zAction" asp-controller="@zController" class="submenu-link">
+                                                        @zName
+                                                    </a>
+                                                }
+                                            }
+                                        </li>
+                                    }
+                                }
+                            </ul>
+                        </li>
+                    }
+                    else
+                    {
+                        var zAction = menu.Action;
+                        var zController = menu.Controller;
+
+                        <li class="sidebar-item @(zActive ? "active" : "")">
+                            <a asp-action="@zAction" asp-controller="@zController" class="sidebar-link" data-title="@menu.Name">
+                                <i class="bi bi-circle"></i>
+                                <span>@menu.Name</span>
+                            </a>
+                        </li>
+                    }
+                }
+            }
+        }
+        <li class="sidebar-title">Manage Location</li>
+        @{
+            if (zParentLocas != null)
+            {
+                foreach (var menu in zParentLocas)
+                {
+                    var zSubCates = zLocas.Where(r => r.Parent == menu.Id).OrderBy(r => r.Sort);
+                    var zActive = IsMenuActive(zSubCates);
+
+                    if (zSubCates.Count() > 0)
+                    {
+                        <li class="sidebar-item has-sub @(zActive ? "active" : "") ">
+                            <a href="#" class="sidebar-link">
+                                <i class="bi bi-circle"></i>
+                                <span>@menu.Name</span>
+                            </a>
+
+                            <ul class="submenu @(zActive ? "submenu-open" : "submenu-closed")">
+                                @{
+                                    foreach (var sub in zSubCates)
+                                    {
+                                        var zSubActive = IsSubMenuActive(sub);
+                                        var zAction = sub.Action;
+                                        var zController = sub.Controller;
+                                        var zParams = sub.Params;
+                                        var zName = sub.Name;
+                                        var zIcon = sub.Icon;
+
+                                        <li class="submenu-item @(zSubActive ? "active" : "")">
+                                            @{
+                                                if (!string.IsNullOrEmpty(sub.Params))
+                                                {
+                                                    <a asp-action="@zAction"
+                                                       asp-controller="@zController"
+                                                       asp-route-id="@zParams" class="submenu-link">
+                                                        @zName
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <a asp-action="@zAction" asp-controller="@zController" class="submenu-link">
+                                                        @zName
+                                                    </a>
+                                                }
+                                            }
+                                        </li>
+                                    }
+                                }
+                            </ul>
+                        </li>
+                    }
+                    else
+                    {
+                        var zAction = menu.Action;
+                        var zController = menu.Controller;
+
+                        <li class="sidebar-item @(zActive ? "active" : "")">
+                            <a asp-action="@zAction" asp-controller="@zController" class="sidebar-link" data-title="@menu.Name">
+                                <i class="bi bi-circle"></i>
+                                <span>@menu.Name</span>
+                            </a>
+                        </li>
+                    }
+                }
+            }
+        }
+        <li class="sidebar-title">Manage Website</li>
+        @{
+            if(zParentMenus != null)
+            {
+                foreach (var menu in zParentMenus)
+                {
+                    var zSubMenu = zMenus.Where(r => r.Parent == menu.Id);
+                    var zActive = IsMenuActive(zSubMenu);
+                    var zIcon = menu.Icon;
+
+                    if (zSubMenu.Count() > 0)
+                    {
+                        <li class="sidebar-item has-sub @(zActive ? "active" : "") ">
+                            <a href="#" class="sidebar-link">
+                                <i class="@zIcon"></i>
+                                <span>@menu.Name</span>
+                            </a>
+
+                            <ul class="submenu @(zActive ? "submenu-open" : "submenu-closed")">
+                                @{
+                                    foreach (var sub in zSubMenu)
+                                    {
+                                        var zSubActive = IsSubMenuActive(sub);
+                                        var zAction = sub.Action;
+                                        var zController = sub.Controller;
+                                        var zParams = sub.Params;
+                                        var zName = sub.Name;
+                                        zIcon = sub.Icon;
+                                        var zNoti = await CountNoti(sub.QueryCode, sub.Params);
+
+                                        <li class="submenu-item @(zSubActive ? "active" : "")">
+                                            @{
+                                                if (!string.IsNullOrEmpty(sub.Params))
+                                                {
+                                                    <a data-title="@menu.Name"
+                                                       asp-action="@zAction"
+                                                       asp-controller="@zController"
+                                                       asp-route-id="@zParams" class="submenu-link px-3">
+                                                        <i class="@zIcon"></i>@zName
+                                                        <span class="badge bg-primary float-end">@zNoti</span>
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <a data-title="@menu.Name"
+                                                       asp-action="@zAction"
+                                                       asp-controller="@zController" class="submenu-link px-3">
+                                                        <i class="@zIcon"></i>@zName
+                                                    </a>
+                                                }
+                                            }
+                                        </li>
+                                    }
+                                }
+                            </ul>
+                        </li>
+                    }
+                    else
+                    {
+                        var zAction = menu.Action;
+                        var zController = menu.Controller;
+                        zActive = IsMenuActiveMainOnly(menu);
+
+                        <li class="sidebar-item @(zActive ? "active" : "")">
+                            <a data-title="@menu.Name"
+                               asp-action="@zAction"
+                               asp-controller="@zController" class="sidebar-link">
+                                <i class="@zIcon"></i>
+                                <span>@menu.Name</span>
+                            </a>
+                        </li>
+                    }
+                }
+            }
+        }
+    </ul>
+</div>
+
+@functions {
+    #region [active of menu]
+    public bool IsMenuActive(IEnumerable<MenuDto> subMenu)
+    {
+        var zCurrentUrl = $"{Context.Request.Path}{Context.Request.QueryString}";
+        if (zCurrentUrl != "/")
+        {
+            if (subMenu.Count() > 0)
+            {
+                return subMenu.Any(sub => IsSubMenuActive(sub));
+            }
+        }
+        return false;
+    }
+
+    public bool IsSubMenuActive(MenuDto sub)
+    {
+        var zCurrentUrl = $"{Context.Request.PathBase}{Context.Request.Path}{Context.Request.QueryString}";
+        var zReferringUrl = _Session.GetRefererUrl();
+        if (!string.IsNullOrEmpty(zReferringUrl))
+        {
+            zCurrentUrl = zReferringUrl;
+        }
+
+        if (!string.IsNullOrEmpty(sub.Action) && !string.IsNullOrEmpty(sub.Controller))
+        {
+            var zGeneratedUrl = Url.Action(sub.Action, sub.Controller, new { id = sub.Params });
+            return zCurrentUrl.Equals(zGeneratedUrl, StringComparison.OrdinalIgnoreCase);
+        }
+        return false;
+    }
+
+    public bool IsMenuActiveMainOnly(MenuDto menu)
+    {
+        var zCurrentUrl = $"{Context.Request.PathBase}{Context.Request.Path}{Context.Request.QueryString}";
+        var zReferringUrl = _Session.GetRefererUrl();
+        if (!string.IsNullOrEmpty(zReferringUrl))
+        {
+            zCurrentUrl = zReferringUrl;
+        }
+
+        var zGeneratedUrl = Url.Action(menu.Action, menu.Controller);
+        return zCurrentUrl.Equals(zGeneratedUrl, StringComparison.OrdinalIgnoreCase);
+    }
+    #endregion
+
+    //Convert CategoryDto to menuDto, action and controller will be fixed and can be changed in appsetting js
+    public List<MenuDto> ConvertCatetoMenu(List<CategoryDto> cates)
+    {
+        var zController = _Config["MenuCategory:Controller"];
+        var zAction = _Config["MenuCategory:Action"];
+        var zIcon = _Config["MenuCategory:Icon"];
+        var zList = new List<MenuDto>();
+        if(cates == null)
+        {
+            return null;
+        }
+
+        foreach (var item in cates)
+        {
+            zList.Add(new MenuDto()
+
+                {
+                    Id = item.Id,
+                    Name = item.Name,
+                    Action = zAction,
+                    Controller = zController,
+                    Icon = zIcon,
+                    Params = item.Id.ToString(),
+                    Parent = item.Parent,
+                });
+        }
+
+        return zList;
+    }
+
+    public async Task<string> CountNoti(string? QueryCode, string? param)
+    {
+        if (!string.IsNullOrEmpty(QueryCode) && !string.IsNullOrEmpty(param))
+        {
+            var userId = 0;
+
+            var count = await _Dapper.ExecProcedureSacalarAsync(QueryCode, new { handle = userId, process = Convert.ToInt32(param) });
+            if (count != null)
+                return count.ToString();
+        }
+
+        return string.Empty;
+    }
+}
