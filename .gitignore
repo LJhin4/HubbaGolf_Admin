@@ -1,0 +1,15 @@
+HubbaGolf_Admin/bin/
+.vs/
+HubbaGolf_Admin/obj/
+HubbaGolf_Admin/wwwroot/assets/
+HubbaGolf_Admin/Properties/ServiceDependencies/WebGolfAdmin - Web Deploy/profile.arm.json
+HubbaGolf_Admin/wwwroot/lib/
+HubbaGolfAdmin.Database/bin/
+HubbaGolfAdmin.Database/obj/
+HubbaGolfAdmin.Database/ContextModify/
+HubbaGolfAdmin.Services/bin/
+HubbaGolfAdmin.Services/obj/HubbaGolfAdmin.Services.csproj.nuget.dgspec.json
+HubbaGolfAdmin.Services/obj/HubbaGolfAdmin.Services.csproj.nuget.g.props
+HubbaGolfAdmin.Services/obj/
+HubbaGolfAdmin.Shared/bin/
+HubbaGolfAdmin.Shared/obj/
