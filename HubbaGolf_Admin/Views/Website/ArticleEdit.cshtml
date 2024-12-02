@@ -210,7 +210,12 @@
                                     Publish
                                 </label>
                             </div>
-
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="chk_IsParent" name="IsParent" @(Model?.IsParent == true ? "checked" : "")>
+                                <label class="form-check-label" for="chk_IsParent">
+                                    IsParent
+                                </label>
+                            </div>
                         </div>
                     </div>
                     <div class="card">
@@ -243,6 +248,7 @@
             <!--hidden id-->
             <input type="hidden" id="txt_ID" name="ID" value="@(Model != null && Model?.Id>0?Model?.Id:0)" />
             <input type="hidden" id="txt_Status" name="HiddenStatus" />
+            <input type="hidden" id="txt_IsParent" name="HiddenParent" />
             <input type="hidden" id="txt_TypeArticle" value="@_TypeArticle" />
             <input type="hidden" id="txt_HasImage" value="@Model?.UrlImage" />
             <input type="hidden" id="txt_Link" value="@Model?.Link" />

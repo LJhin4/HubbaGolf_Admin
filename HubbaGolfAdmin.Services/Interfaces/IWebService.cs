@@ -14,8 +14,9 @@ namespace HubbaGolfAdmin.Services.Interfaces
         Task<int> DeleteCategoryById(int id);
         #endregion
         Task<List<CategoryDto>>? GetListLocationAsync();
+        Task<List<ArticleDto>> GetListArticleByCategoryIdAdminAsync(int categoryId);
         Task<List<ArticleDto>> GetListArticleByCategoryIdAsync(int categoryId);
-
+        Task<List<ArticleDto>> GetListArticleMenuTopTierAsync();
         Task<List<CategoryDto>> GetListAllCategoryAsync();
 
         Task<List<ArticleDto>> SearchArticle(int id, string value);

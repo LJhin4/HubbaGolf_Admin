@@ -33,6 +33,8 @@ public partial class Article
 
     public string? Location { get; set; }
 
+    public bool? IsParent { get; set; }
+
     public string? Description { get; set; }
 
     public DateTime? DateExp { get; set; }

@@ -14,6 +14,7 @@ namespace HubbaGolfAdmin.Database.Dtos
         public string? Content { get; set; }
         public int? Status { get; set; }
         public string? HiddenStatus { get; set; }
+        public string? HiddenParent { get; set; }
         public string? Author { get; set; }
         public DateTime? CreatedOn { get; set; }
         public string? Icon { get; set; }
@@ -22,6 +23,7 @@ namespace HubbaGolfAdmin.Database.Dtos
         public IFormFile? FileImage { get; set; }
         public string? Description { get; set; }
         public string? Location { get; set; }
+        public bool? IsParent { get; set; }
         public DateTime? DateExp { get; set; }
 
         public List<IFormFile>? FileDocument { get; set; }

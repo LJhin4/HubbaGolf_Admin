@@ -110,7 +110,7 @@ namespace HubbaGolf_Admin.Controllers
         {
             _SessionStore.StoreCurrentUrl();
 
-            var zList = await _WebService.GetListArticleByCategoryIdAsync(id);
+            var zList = await _WebService.GetListArticleByCategoryIdAdminAsync(id);
             ViewBag.CategoryId = id;
 
             HttpContext.Session.SetInt32("CategoryId", id);
@@ -195,6 +195,7 @@ namespace HubbaGolf_Admin.Controllers
                 //HiddenStatus must be used to store the value of Publish
                 //Because the check status button is not stable, and if it is checked it is 1, if it is not checked it is null
                 articleDto.Status = articleDto.HiddenStatus == "1" ? 1 : 0;
+                articleDto.IsParent = articleDto.HiddenParent == "1" ? true : false;
 
                 var zResult = await _WebService.SaveArticleAsync(id, articleDto);
                 if (zResult.Success && zResult.Data != 0)
@@ -326,6 +327,19 @@ namespace HubbaGolf_Admin.Controllers
             {
                 var zMenu = await _WebService.GetCourseByCountryIdAsync(id);
                 return Ok(zMenu);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetListArticleMenuTopTier()
+        {
+            try
+            {
+                var zList = await _WebService.GetListArticleMenuTopTierAsync();
+                return Ok(zList);
             }
             catch (Exception ex)
             {

@@ -110,14 +110,20 @@ $(function () {
     if (parseInt(id) === 0) {
         $("#chk_Status").prop("checked", true);
         $("#txt_Status").val(1);
+        $("#txt_IsParent").val(0);
     }
     else {
         // Add the value of the publish button (Status) to HiddenStatus
         $("#txt_Status").val($("#chk_Status").prop("checked") ? 1 : 0);
+        $("#txt_IsParent").val($("#chk_IsParent").prop("checked") ? 1 : 0);
     }
 
     $("#chk_Status").on("change", function () {
         $("#txt_Status").val($(this).prop("checked") ? 1 : 0);
+    });
+
+    $("#chk_IsParent").on("change", function () {
+        $("#txt_IsParent").val($(this).prop("checked") ? 1 : 0);
     });
 
     //Open select cbo_Category again before submitting because the disabled attribute will not capture the value when post submit
