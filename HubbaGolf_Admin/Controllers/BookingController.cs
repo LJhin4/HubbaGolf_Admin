@@ -23,6 +23,7 @@ namespace HubbaGolf_Admin.Controllers
 
         public IActionResult Index()
         {
+            _SessionStore.StoreCurrentUrl();
             List<Events> events = _EComDbContext.Events
                .Where(e => e.StatusRecord != 99)
                .OrderByDescending(e => e.OrderNumber)

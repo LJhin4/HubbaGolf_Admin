@@ -427,5 +427,71 @@ namespace HubbaGolfAdmin.Services.Implements
                   .ToListAsync();
             return _Mapper.Map<List<ArticleDto>>(zList);
         }
+
+        #region [Manage Banner]
+        public async Task<List<ArticleDto>> GetArticleHomepage(int id)
+        {
+            var zArticles = await _DbContext.Articles
+                                        .Where(r => r.RecordStatus != 99 && r.MenuId == id)
+                                        .ToListAsync();
+            return _Mapper.Map(zArticles, new List<ArticleDto>());
+        }
+        public async Task<ArticleDto?> GetArticleHomepageById(int id)
+        {
+            var zArticle = await _DbContext.Articles
+                                        .Where(r => r.RecordStatus != 99 && r.Id == id)
+                                        .FirstOrDefaultAsync();
+            return _Mapper.Map(zArticle, new ArticleDto());
+        }
+        public async Task<int> SaveArticleHomepage(int id, ArticleDto articleDto)
+        {
+            Article? zArticle;
+
+            if (id != 0)
+            {
+                zArticle = await _DbContext.Articles.FindAsync(id);
+                if (zArticle != null)
+                {
+                    zArticle = _Mapper.Map(articleDto, zArticle);
+                    _DbContext.Update(zArticle);
+                }
+                else
+                {
+                    // Handle the case where the article with the given ID is not found
+                    throw new Exception("Article with ID " + id + " not found.");
+                }
+            }
+            else
+            {
+                zArticle = _Mapper.Map(articleDto, new Article());
+                _DbContext.Add(zArticle);
+            }
+
+            await _DbContext.SaveChangesAsync();
+
+            // Return the ID of the inserted or updated article
+            return zArticle.Id;
+        }
+        public async Task<int> DeleteArticleHomepageById(int id)
+        {
+            var zArticle = await _DbContext.Articles.FindAsync(id);
+            if (zArticle != null)
+            {
+                _DbContext.Remove(zArticle);
+                return await _DbContext.SaveChangesAsync();
+            }
+            else
+            {
+                return 0;
+            }
+        }
+        public async Task<List<ArticleDto>> GetBanner()
+        {
+            var zArticles = await _DbContext.Articles
+                                        .Where(r => r.RecordStatus != 99 && r.MenuId == 5)
+                                        .ToListAsync();
+            return _Mapper.Map(zArticles, new List<ArticleDto>());
+        }
+        #endregion
     }
 }

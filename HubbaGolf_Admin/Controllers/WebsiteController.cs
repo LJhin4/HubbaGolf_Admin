@@ -346,5 +346,70 @@ namespace HubbaGolf_Admin.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        #region [Manage Banner]
+        public async Task<IActionResult> GetArticleHomepage(int id)
+        {
+            _SessionStore.StoreCurrentUrl();
+            var zArticle = await _WebService.GetArticleHomepage(id);
+            return View("~/Views/Website/ArticleHomepage.cshtml", zArticle);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetArticleHomepageById(int id)
+        {
+            var zArticle = await _WebService.GetArticleHomepageById(id);
+            if (zArticle != null)
+                return Ok(zArticle);
+            else
+                return BadRequest("not found");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveArticleHomepage(int id, ArticleDto articleDto)
+        {
+            articleDto.Status ??= 1;
+
+            if (articleDto.FileImage != null &&
+                articleDto.FileImage.Length > 0)
+            {
+                var fileName = Guid.NewGuid().ToString() + "_" + articleDto.FileImage.FileName;
+                articleDto.UrlImage = ViewHelper.UploadFile(articleDto.FileImage, _ImagePath); //Helper.UploadFile(articleDto.FileImage, fileName, _ImagePath);
+            }
+
+            var zRecord = await _WebService.SaveArticleHomepage(id, articleDto);
+
+            if (zRecord != 0)
+                return RedirectToAction(nameof(GetArticleHomepage), new { id = 5 });
+            else
+                return BadRequest();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteArticleHomepageById(int id)
+        {
+            try
+            {
+                var zRecord = await _WebService.DeleteArticleHomepageById(id);
+                if (zRecord != 0)
+                    return Ok();
+                else
+                    return BadRequest();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetBanner()
+        {
+            var zArticle = await _WebService.GetBanner();
+            if (zArticle != null)
+                return Ok(zArticle);
+            else
+                return BadRequest("not found");
+        }
+        #endregion
     }
 }

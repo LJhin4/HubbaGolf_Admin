@@ -29,5 +29,12 @@ namespace HubbaGolfAdmin.Services.Interfaces
         Task<bool> UpdateRank(int id, int rank);
         Task<List<MenuHeaderDto>> GetMenuHeaderAsync();
         Task<List<ArticleDto>> GetCourseByCountryIdAsync(int id);
+        #region [<Manage Banner>]
+        Task<List<ArticleDto>> GetArticleHomepage(int id);
+        Task<ArticleDto?> GetArticleHomepageById(int id);
+        Task<int> SaveArticleHomepage(int id, ArticleDto articleDto);
+        Task<int> DeleteArticleHomepageById(int id);
+        Task<List<ArticleDto>> GetBanner();
+        #endregion
     }
 }

@@ -32,7 +32,7 @@ namespace HubbaGolfAdmin.Middlewares
         {
             var zSessionStoreSrv = context.RequestServices.GetService<SessionStore>();
 
-            var excludedPaths = new[] { "/Booking/AddEvent", "/Booking/GetEvent", "/swagger/index.html", "/Website/GetListArticleByCategoryId", "/Website/GetAllLocation", "/Website/GetArticleById", "/Website/GetMenuHeader", "/Website/getCourseByCountryId", "/Website/GetListArticleMenuTopTier" };
+            var excludedPaths = new[] { "/Booking/AddEvent", "/Booking/GetEvent", "/swagger/index.html", "/Website/GetListArticleByCategoryId", "/Website/GetAllLocation", "/Website/GetArticleById", "/Website/GetMenuHeader", "/Website/getCourseByCountryId", "/Website/GetListArticleMenuTopTier", "/Website/GetBanner" };
 
             if (excludedPaths.Any(path => context.Request.Path.StartsWithSegments(path)))
             {

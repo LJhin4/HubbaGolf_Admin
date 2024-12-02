@@ -130,6 +130,7 @@ namespace HubbaGolfAdmin.Database
                 entity.Property(e => e.DateExp).HasColumnType("datetime");
                 entity.Property(e => e.Description).HasMaxLength(500);
                 entity.Property(e => e.Icon).HasMaxLength(250);
+                entity.Property(e => e.MenuId).HasColumnName("MenuID");
                 entity.Property(e => e.ModifiedBy).HasMaxLength(50);
                 entity.Property(e => e.ModifiedName).HasMaxLength(250);
                 entity.Property(e => e.ModifiedOn).HasColumnType("datetime");

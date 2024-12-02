@@ -9,6 +9,8 @@ public partial class Article
 
     public int? CategoryId { get; set; }
 
+    public int? MenuId { get; set; }
+
     public string? Title { get; set; }
 
     public string? Summary { get; set; }
