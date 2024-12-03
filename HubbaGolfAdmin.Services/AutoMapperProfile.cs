@@ -26,6 +26,10 @@ namespace HubbaGolfAdmin.Services
             CreateMap<CategoryDto, Category>()
                 .ReverseMap()
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
+
+            CreateMap<PricingDto, Pricing>()
+                .ReverseMap()
+                .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
         }
     }
 

@@ -411,5 +411,61 @@ namespace HubbaGolf_Admin.Controllers
                 return BadRequest("not found");
         }
         #endregion
+
+        #region [Manage Price]
+        public async Task<IActionResult> GetListPrice()
+        {
+            _SessionStore.StoreCurrentUrl();
+            var zPrice = await _WebService.GetListPrice();
+            return View("~/Views/Website/PriceList.cshtml", zPrice);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetPriceById(int id)
+        {
+            var zPrice = await _WebService.GetPriceById(id);
+            if (zPrice != null)
+                return Ok(zPrice);
+            else
+                return BadRequest("not found");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SavePrice(int id, PricingDto pricingDto)
+        {
+            var zRecord = await _WebService.SavePrice(id, pricingDto);
+
+            if (zRecord != 0)
+                return RedirectToAction(nameof(GetListPrice));
+            else
+                return BadRequest();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeletePriceById(int id)
+        {
+            try
+            {
+                var zRecord = await _WebService.DeletePriceById(id);
+                if (zRecord != 0)
+                    return Ok();
+                else
+                    return BadRequest();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetPriceByArticleId(int id)
+        {
+            var zPrice = await _WebService.GetPriceByArticleId(id);
+            if (zPrice != null)
+                return Ok(zPrice);
+            else
+                return BadRequest("not found");
+        }
+        #endregion
     }
 }

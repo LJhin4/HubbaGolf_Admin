@@ -22,6 +22,7 @@ namespace HubbaGolfAdmin.Database
         public virtual DbSet<Menu> Menus { get; set; }
         public virtual DbSet<Category> Categories { get; set; }
         public virtual DbSet<Article> Articles { get; set; }
+        public virtual DbSet<Pricing> Pricings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -134,6 +135,25 @@ namespace HubbaGolfAdmin.Database
                 entity.Property(e => e.ModifiedBy).HasMaxLength(50);
                 entity.Property(e => e.ModifiedName).HasMaxLength(250);
                 entity.Property(e => e.ModifiedOn).HasColumnType("datetime");
+            });
+
+            modelBuilder.Entity<Pricing>(entity =>
+            {
+                entity.ToTable("Pricing");
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.ArticleId).HasColumnName("ArticleID");
+                entity.Property(e => e.CreatedBy).HasMaxLength(50);
+                entity.Property(e => e.CreatedName).HasMaxLength(250);
+                entity.Property(e => e.CreatedOn).HasColumnType("datetime");
+                entity.Property(e => e.Description).HasMaxLength(500);
+                entity.Property(e => e.EffectiveDate).HasColumnType("datetime");
+                entity.Property(e => e.ModifiedBy).HasMaxLength(50);
+                entity.Property(e => e.ModifiedName).HasMaxLength(250);
+                entity.Property(e => e.ModifiedOn).HasColumnType("datetime");
+                entity.Property(e => e.Price).HasColumnType("decimal(19, 2)");
+                entity.Property(e => e.PricingType).HasMaxLength(250);
+                entity.Property(e => e.SpecificDate).HasColumnType("datetime");
             });
 
             OnModelCreatingPartial(modelBuilder);

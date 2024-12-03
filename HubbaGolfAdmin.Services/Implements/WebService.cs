@@ -5,6 +5,7 @@ using HubbaGolfAdmin.Database.Dtos;
 using HubbaGolfAdmin.Database.Models;
 using HubbaGolfAdmin.Services.Interfaces;
 using HubbaGolfAdmin.Shared;
+using Microsoft.IdentityModel.Tokens;
 
 namespace HubbaGolfAdmin.Services.Implements
 {
@@ -98,8 +99,25 @@ namespace HubbaGolfAdmin.Services.Implements
                                join c in _DbContext.Categories on a.CategoryId equals c.Id
                                join c0 in _DbContext.Categories on c.Parent equals c0.Id
                                where a.RecordStatus != 99 && c.RecordStatus != 99 && c0.RecordStatus != 99 && c0.Id == 24 && a.IsParent == true
-                               select a)
-                              .OrderByDescending(a => a.CreatedOn)
+                               select new ArticleDto
+                               {
+                                   Id = a.Id,
+                                   CategoryId = a.CategoryId,
+                                   Title = a.Title,
+                                   Summary = a.Summary,
+                                   Content = a.Content,
+                                   Status = a.Status,
+                                   Author = a.Author,
+                                   CreatedOn = a.CreatedOn,
+                                   Icon = a.Icon,
+                                   UrlImage = a.UrlImage,
+                                   Description = a.Description,
+                                   Location = a.Location,
+                                   IsParent = a.IsParent,
+                                   Link = a.Link,
+                                   Rank = c.Sort
+                               })
+                              .OrderBy(c => c.Rank)
                               .ToListAsync();
             return _Mapper.Map<List<ArticleDto>>(zList);
         }
@@ -183,6 +201,10 @@ namespace HubbaGolfAdmin.Services.Implements
                     zArticle = await _DbContext.Articles.FindAsync(id);
                     if (zArticle != null)
                     {
+                        if(articleDto.UrlImage.IsNullOrEmpty())
+                        {
+                            articleDto.UrlImage = zArticle.UrlImage;
+                        }
                         articleDto.NullToEmpty();
                         zArticle = _Mapper.Map(articleDto, zArticle);
                         _DbContext.Update(zArticle);
@@ -409,10 +431,10 @@ namespace HubbaGolfAdmin.Services.Implements
             itemContract.link = "/contact";
             result.Add(itemContract);
 
-            var itemBlog = new MenuHeaderDto();
-            itemBlog.title = "Blog";
-            itemBlog.link = "/news";
-            result.Add(itemBlog);
+            //var itemBlog = new MenuHeaderDto();
+            //itemBlog.title = "Blog";
+            //itemBlog.link = "/news";
+            //result.Add(itemBlog);
 
             return result;
         }
@@ -491,6 +513,99 @@ namespace HubbaGolfAdmin.Services.Implements
                                         .Where(r => r.RecordStatus != 99 && r.MenuId == 5)
                                         .ToListAsync();
             return _Mapper.Map(zArticles, new List<ArticleDto>());
+        }
+        #endregion
+
+        #region [Manage Price]
+        public async Task<PricingView> GetListPrice()
+        {
+            var result = new PricingView();
+            var zPrices = await (from p in _DbContext.Pricings
+                                 join a in _DbContext.Articles on p.ArticleId equals a.Id
+                                 where p.RecordStatus != 99 && a.RecordStatus != 99
+                                 select new PricingDto
+                                 {
+                                     Id = p.Id,
+                                     ArticleId = p.ArticleId,
+                                     ArticleTitle = a.Title,
+                                     Price = p.Price
+                                 })
+                                 .ToListAsync();
+            var zCourses = await (from a in _DbContext.Articles
+                                  join c in _DbContext.Categories on a.CategoryId equals c.Id
+                                  join c0 in _DbContext.Categories on c.Parent equals c0.Id
+                                  where a.RecordStatus != 99 && c.RecordStatus != 99 && c0.RecordStatus != 99
+                                  && c0.Type == "Location" && c0.Parent == 0
+                                  select a)
+                                  .ToListAsync();
+            result.Pricing = zPrices;
+            result.Course = zCourses;
+            return result;
+        }
+        public async Task<PricingDto?> GetPriceById(int id)
+        {
+            var zPrice = await _DbContext.Pricings
+                                        .Where(r => r.RecordStatus != 99 && r.Id == id)
+                                        .FirstOrDefaultAsync();
+            return _Mapper.Map(zPrice, new PricingDto());
+        }
+        public async Task<int> SavePrice(int id, PricingDto priceDto)
+        {
+            Pricing? zPrice;
+
+            if (id != 0)
+            {
+                zPrice = await _DbContext.Pricings.FindAsync(id);
+                if (zPrice != null)
+                {
+                    zPrice = _Mapper.Map(priceDto, zPrice);
+                    _DbContext.Update(zPrice);
+                }
+                else
+                {
+                    // Handle the case where the price with the given ID is not found
+                    throw new Exception("Price with ID " + id + " not found.");
+                }
+            }
+            else
+            {
+                zPrice = _Mapper.Map(priceDto, new Pricing());
+                _DbContext.Add(zPrice);
+            }
+
+            await _DbContext.SaveChangesAsync();
+
+            // Return the ID of the inserted or updated price
+            return zPrice.Id;
+        }
+        public async Task<int> DeletePriceById(int id)
+        {
+            var zPrice = await _DbContext.Pricings.FindAsync(id);
+            if (zPrice != null)
+            {
+                _DbContext.Remove(zPrice);
+                return await _DbContext.SaveChangesAsync();
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
+        public async Task<PricingDto?> GetPriceByArticleId(int id)
+        {
+            var zPrice = await (from p in _DbContext.Pricings
+                                 join a in _DbContext.Articles on p.ArticleId equals a.Id
+                                 where p.RecordStatus != 99 && a.RecordStatus != 99 && p.ArticleId != id
+                                 select new PricingDto
+                                 {
+                                     Id = p.Id,
+                                     ArticleId = p.ArticleId,
+                                     ArticleTitle = a.Title,
+                                     Price = p.Price
+                                 })
+                                 .FirstOrDefaultAsync();
+            return _Mapper.Map(zPrice, new PricingDto());
         }
         #endregion
     }

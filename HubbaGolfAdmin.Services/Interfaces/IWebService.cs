@@ -36,5 +36,12 @@ namespace HubbaGolfAdmin.Services.Interfaces
         Task<int> DeleteArticleHomepageById(int id);
         Task<List<ArticleDto>> GetBanner();
         #endregion
+        #region [<Manage Banner>]
+        Task<PricingView> GetListPrice();
+        Task<PricingDto?> GetPriceById(int id);
+        Task<int> SavePrice(int id, PricingDto priceDto);
+        Task<int> DeletePriceById(int id);
+        Task<PricingDto?> GetPriceByArticleId(int id);
+        #endregion
     }
 }
