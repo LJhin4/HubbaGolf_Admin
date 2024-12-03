@@ -98,7 +98,7 @@ namespace HubbaGolfAdmin.Services.Implements
             var zList = await (from a in _DbContext.Articles
                                join c in _DbContext.Categories on a.CategoryId equals c.Id
                                join c0 in _DbContext.Categories on c.Parent equals c0.Id
-                               where a.RecordStatus != 99 && c.RecordStatus != 99 && c0.RecordStatus != 99 && c0.Id == 24 && a.IsParent == true
+                               where a.RecordStatus != 99 && c.RecordStatus != 99 && c0.Id == 24 && a.IsParent == true
                                select new ArticleDto
                                {
                                    Id = a.Id,
