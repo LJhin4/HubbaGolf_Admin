@@ -112,6 +112,13 @@ namespace HubbaGolf_Admin.Controllers
 
             var zList = await _WebService.GetListArticleByCategoryIdAdminAsync(id);
             ViewBag.CategoryId = id;
+            ViewBag.SelectType = await _WebService.GetListCategoryByParentIdAsync(24);
+            ViewBag.IsUseFac = false;
+            var zFacility = await _WebService.GetListLocationAsync();
+            if(zFacility != null)
+            {
+                ViewBag.IsUseFac = zFacility.Any(item => item.Id == id);
+            }    
 
             HttpContext.Session.SetInt32("CategoryId", id);
             return View("~/Views/Website/ArticleList.cshtml", zList);
@@ -129,13 +136,20 @@ namespace HubbaGolf_Admin.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        public async Task<IActionResult> SearchArticle(int id, string value)
+        public async Task<IActionResult> SearchArticle(int id, string value, int? type)
         {
-            var zList = await _WebService.SearchArticle(id, value);
+            var zList = await _WebService.SearchArticle(id, value, type);
             var zCategoryId = HttpContext.Session.GetInt32("CategoryId");
             if (zCategoryId != null)
             {
                 ViewBag.CategoryId = id;
+            }
+            ViewBag.SelectType = await _WebService.GetListCategoryByParentIdAsync(24);
+            ViewBag.IsUseFac = false;
+            var zFacility = await _WebService.GetListLocationAsync();
+            if (zFacility != null)
+            {
+                ViewBag.IsUseFac = zFacility.Any(item => item.Id == id);
             }
 
             return View("~/Views/Website/ArticleList.cshtml", zList);
@@ -144,6 +158,7 @@ namespace HubbaGolf_Admin.Controllers
         {
             var zArticle = await _WebService.GetArticleByIdAsync(id);
             ViewBag.SelectCategory = await _WebService.GetListAllCategoryAsync();
+            ViewBag.SelectType = await _WebService.GetListCategoryByParentIdAsync(24);
 
             var zCategoryId = HttpContext.Session.GetInt32("CategoryId");
             if (zCategoryId != null)
@@ -326,6 +341,19 @@ namespace HubbaGolf_Admin.Controllers
             try
             {
                 var zMenu = await _WebService.GetCourseByCountryIdAsync(id);
+                return Ok(zMenu);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetCourseByCountryIdAndTypeID(int typeId, int countryId)
+        {
+            try
+            {
+                var zMenu = await _WebService.GetCourseByCountryIdAndTypeIDAsync(typeId, countryId);
                 return Ok(zMenu);
             }
             catch (Exception ex)

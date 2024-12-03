@@ -36,9 +36,9 @@ namespace HubbaGolfAdmin.Services.Implements
             var zCategory = await _DbContext.Categories.Where(r => r.RecordStatus != 99).OrderBy(r => r.Sort).ToListAsync();
             return _Mapper.Map<List<CategoryDto>>(zCategory);
         }
-        public async Task<List<CategoryDto>> GetListCategoryAllAsync()
+        public async Task<List<CategoryDto>> GetListCategoryByParentIdAsync(int id)
         {
-            var zCategory = await _DbContext.Categories.Where(r => r.RecordStatus != 99).OrderBy(r => r.Sort).ToListAsync();
+            var zCategory = await _DbContext.Categories.Where(r => r.RecordStatus != 99 && r.Parent == id).OrderBy(r => r.Sort).ToListAsync();
             return _Mapper.Map<List<CategoryDto>>(zCategory);
         }
         public async Task<CategoryDto?> GetCategoryByIdAsync(int id)
@@ -121,14 +121,15 @@ namespace HubbaGolfAdmin.Services.Implements
                               .ToListAsync();
             return _Mapper.Map<List<ArticleDto>>(zList);
         }
+
         #endregion
 
-        public async Task<List<ArticleDto>> SearchArticle(int id, string value)
+        public async Task<List<ArticleDto>> SearchArticle(int id, string value, int? type)
         {
             var zArticle = new List<Article>();
             if (!string.IsNullOrEmpty(value))
             {
-                zArticle = await _DbContext.Articles.Where(s => s.CategoryId == id &&
+                zArticle = await _DbContext.Articles.Where(s => s.CategoryId == id && (type == null || s.Type == type.Value) &&
                                                                 s.RecordStatus != 99 &&
                                                                 (s.Title.ToUpper().Contains(value.ToUpper()) ||
                                                                 s.Summary.ToUpper().Contains(value.ToUpper())))
@@ -138,7 +139,7 @@ namespace HubbaGolfAdmin.Services.Implements
             }
             else
             {
-                zArticle = await _DbContext.Articles.Where(s => s.CategoryId == id && s.RecordStatus != 99)
+                zArticle = await _DbContext.Articles.Where(s => s.CategoryId == id && s.RecordStatus != 99 && (type == null || s.Type == type.Value))
                                                     .OrderBy(r => r.Rank)
                                                     .ThenByDescending(s => s.CreatedOn)
                                                     .ToListAsync();
@@ -448,6 +449,30 @@ namespace HubbaGolfAdmin.Services.Implements
                   .OrderByDescending(a => a.CreatedOn)
                   .ToListAsync();
             return _Mapper.Map<List<ArticleDto>>(zList);
+        }
+        public async Task<List<ArticleGroupDto>> GetCourseByCountryIdAndTypeIDAsync(int typeId, int countryId)
+        {
+            var result = new List<ArticleGroupDto>();
+            var zCategory = await (from c in _DbContext.Categories
+                                   join c0 in _DbContext.Categories on c.Parent equals c0.Id
+                                   where c.RecordStatus != 99 && c0.RecordStatus != 99 && c0.Id == countryId
+                                   select c)
+                  .OrderBy(c => c.Sort)
+                  .ToListAsync();
+
+            result = _Mapper.Map<List<ArticleGroupDto>>(zCategory);
+            foreach(var item in result)
+            {
+                var zList = await (from a in _DbContext.Articles
+                                   join c in _DbContext.Categories on a.CategoryId equals c.Id
+                                   where a.RecordStatus != 99 && c.RecordStatus != 99 && a.Type == typeId && a.CategoryId == item.Id
+                                   select a)
+                  .OrderByDescending(a => a.CreatedOn)
+                  .ToListAsync();
+
+                item.Courses = _Mapper.Map<List<ArticleDto>>(zList);
+            }    
+            return result;
         }
 
         #region [Manage Banner]

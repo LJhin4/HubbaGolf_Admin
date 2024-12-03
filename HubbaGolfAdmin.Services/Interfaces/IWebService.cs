@@ -8,7 +8,7 @@ namespace HubbaGolfAdmin.Services.Interfaces
     {
         #region [Quản lý Category]
         Task<List<CategoryDto>>? GetListCategoryAsync();
-        Task<List<CategoryDto>>? GetListCategoryAllAsync();
+        Task<List<CategoryDto>>? GetListCategoryByParentIdAsync(int id);
         Task<CategoryDto?> GetCategoryByIdAsync(int categoryId);
         Task<int> SaveCategory(int id, CategoryDto categoryDto);
         Task<int> DeleteCategoryById(int id);
@@ -19,7 +19,7 @@ namespace HubbaGolfAdmin.Services.Interfaces
         Task<List<ArticleDto>> GetListArticleMenuTopTierAsync();
         Task<List<CategoryDto>> GetListAllCategoryAsync();
 
-        Task<List<ArticleDto>> SearchArticle(int id, string value);
+        Task<List<ArticleDto>> SearchArticle(int id, string value, int? type);
         Task<ArticleDto?> GetArticleByIdAsync(int id);
         Task<TypeArticle> TypeOfArticle(int cateId);
         Task<Result<int>> SaveArticleAsync(int id, ArticleDto articleDto);
@@ -29,6 +29,7 @@ namespace HubbaGolfAdmin.Services.Interfaces
         Task<bool> UpdateRank(int id, int rank);
         Task<List<MenuHeaderDto>> GetMenuHeaderAsync();
         Task<List<ArticleDto>> GetCourseByCountryIdAsync(int id);
+        Task<List<ArticleGroupDto>> GetCourseByCountryIdAndTypeIDAsync(int typeId, int countryId);
         #region [<Manage Banner>]
         Task<List<ArticleDto>> GetArticleHomepage(int id);
         Task<ArticleDto?> GetArticleHomepageById(int id);

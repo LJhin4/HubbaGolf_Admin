@@ -8,10 +8,15 @@
 @{
     var _ListCates = new List<CategoryDto>();
     var _ListParentCates = new List<CategoryDto>();
+    var _ListType = new List<CategoryDto>();
     if (ViewBag.SelectCategory != null)
     {
         _ListCates = ViewBag.SelectCategory as List<CategoryDto>;
         _ListParentCates = _ListCates?.Where(s => s.Parent == 0).ToList();
+    }
+    if (ViewBag.SelectType != null)
+    {
+        _ListType = ViewBag.SelectType as List<CategoryDto>;
     }
 
     //The default is normal posts
@@ -99,7 +104,7 @@
                                 </div> *@
                             </div>
 
-                            <div class="row">
+                            <div class="row" hidden>
                                 <div class="col-12">
                                     <select class="form-select" id="cbo_Link" name="Link">
                                     </select>
@@ -158,8 +163,23 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="txt_TagID">TagID</label>
-                                <input type="text" id="txt_TagID" class="form-control" name="TagID" value="@(Model?.TagId ?? "")">
+                                <label for="cbo_Type">Facilities</label>
+                                <select class="form-select select2" id="cbo_Type" name="Type">
+                                    <option value="">Choose...</option>
+                                    @{
+                                        foreach (var item in _ListType)
+                                        {
+                                            if (Model != null && Model?.Type == item.Id)
+                                            {
+                                                <option value="@item.Id" selected>@item.Name</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@item.Id">@item.Name</option>
+                                            }
+                                        }
+                                    }
+                                </select>
                             </div>
 
                             <div class="form-group">
@@ -210,7 +230,7 @@
                                     Publish
                                 </label>
                             </div>
-                            <div class="form-check form-switch">
+                            <div class="form-check form-switch" hidden>
                                 <input class="form-check-input" type="checkbox" id="chk_IsParent" name="IsParent" @(Model?.IsParent == true ? "checked" : "")>
                                 <label class="form-check-label" for="chk_IsParent">
                                     IsParent
@@ -218,7 +238,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card">
+                    <div class="card" hidden>
                         <div class="card-body">
                             <h4 class="card-title">Update history</h4>
                             @* @{

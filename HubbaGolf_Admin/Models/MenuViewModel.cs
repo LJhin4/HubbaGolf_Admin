@@ -7,5 +7,6 @@ namespace HubbaGolf_Admin.Models
         public List<MenuDto>? MenuAdmin { get; set; }
         public List<CategoryDto>? MenuCategory { get; set; }
         public List<CategoryDto>? MenuLocation { get; set; }
+        public List<CategoryDto>? Facilities { get; set; }
     }
 }

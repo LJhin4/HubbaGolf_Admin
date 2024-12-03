@@ -1,6 +1,13 @@
 ﻿@using HubbaGolfAdmin.Database.Dtos
 @using HubbaGolfAdmin.Shared
 @model List<ArticleDto>
+@{
+    var _ListType = new List<CategoryDto>();
+    if (ViewBag.SelectType != null)
+    {
+        _ListType = ViewBag.SelectType as List<CategoryDto>;
+    }
+}
 
 @section Styles {
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
@@ -12,15 +19,40 @@
     <section class="section">
         <div class="card">
             <div class="card-body">
-                <form class="input-group" asp-action="SearchArticle" asp-controller="website">
-                    <input class="form-control" placeholder="Search by title or summary..." type="text" id="txt_Search" name="value">
-                    <button type="submit" class="btn btn-primary">
-                        <span class="fa-fw select-all fas"></span>
-                        Search
-                    </button>
-                    <!--CategoryId-->
-                    <input type="hidden" name="id" id="txt_CategoryId" value="@((int)(ViewBag.CategoryId ?? 0))" />
+                <form asp-action="SearchArticle" asp-controller="website">
+                <div class="row">
+                    @{
+                        if (ViewBag.IsUseFac != null && ViewBag.IsUseFac)
+                        {
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <select class="form-select select2" id="cbo_Type" name="type">
+                                        <option value="">Choose...</option>
+                                        @{
+                                            foreach (var item in _ListType)
+                                            {
+                                                <option value="@item.Id">@item.Name</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        }
+                    }
+                    <div class="col">
+                        <div class="input-group">
+                            <input class="form-control" placeholder="Search by title or summary..." type="text" id="txt_Search" name="value">
+                            <button type="submit" class="btn btn-primary">
+                                <span class="fa-fw select-all fas"></span>
+                                Search
+                            </button>
+                            <!--CategoryId-->
+                            <input type="hidden" name="id" id="txt_CategoryId" value="@((int)(ViewBag.CategoryId ?? 0))" />
+                        </div>
+                    </div>
+                </div>
                 </form>
+                
                 <hr />
                 <table class="table table-striped breakspace" id="table">
                     <thead>

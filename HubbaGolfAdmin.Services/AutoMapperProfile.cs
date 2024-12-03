@@ -11,6 +11,7 @@ namespace HubbaGolfAdmin.Services
         {
             CreateMap<ArticleDto, Article>().ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<Article, ArticleDto>().ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<Category, ArticleGroupDto>().ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
 
             CreateMap<UserDto, User>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())

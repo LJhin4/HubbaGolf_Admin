@@ -24,7 +24,8 @@ namespace HubbaGolf_Admin.ViewComponents
             {
                 MenuAdmin = await _SystemService.GetListAllMenuAsync(),
                 MenuCategory = await _WebService.GetListCategoryAsync(),
-                MenuLocation = await _WebService.GetListLocationAsync()
+                MenuLocation = await _WebService.GetListLocationAsync(),
+                Facilities = await _WebService.GetListCategoryByParentIdAsync(24)
             };
 
             return View(zMenuView);

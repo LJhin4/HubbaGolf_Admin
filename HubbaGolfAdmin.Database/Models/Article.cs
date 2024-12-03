@@ -41,6 +41,8 @@ public partial class Article
 
     public DateTime? DateExp { get; set; }
 
+    public int? Type { get; set; }
+
     public int? RecordStatus { get; set; }
 
     public string? CreatedBy { get; set; }
