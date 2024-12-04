@@ -6,6 +6,7 @@ using HubbaGolfAdmin.Database.Models;
 using HubbaGolfAdmin.Services.Interfaces;
 using HubbaGolfAdmin.Shared;
 using Microsoft.IdentityModel.Tokens;
+using System;
 
 namespace HubbaGolfAdmin.Services.Implements
 {
@@ -449,6 +450,59 @@ namespace HubbaGolfAdmin.Services.Implements
                   .OrderByDescending(a => a.CreatedOn)
                   .ToListAsync();
             return _Mapper.Map<List<ArticleDto>>(zList);
+        }
+        public async Task<List<ArticleFacilityDto>> GetCourseGroupFacilityByCountryIdAsync(int countryId)
+        {
+            var result = new List<ArticleFacilityDto>();
+
+            var zFac = await (from c in _DbContext.Categories
+                              join c0 in _DbContext.Categories on c.Parent equals c0.Id
+                              join a in _DbContext.Articles on c.Id equals a.CategoryId
+                              join f in _DbContext.Categories on a.Type equals f.Id
+                              where c.RecordStatus != 99 && c0.RecordStatus != 99 && c0.Id == countryId && a.RecordStatus != 99 && f.RecordStatus != 99 && f.Parent == 24
+                              select f)
+                      .Distinct()
+                      .OrderBy(c => c.Sort)
+                      .ToListAsync(); // get facility
+            foreach (var fac in zFac)
+            {
+                var itemResult = new ArticleFacilityDto();
+                itemResult.FacilityId = fac.Id;
+                itemResult.FacilityName = fac.Name;
+                itemResult.Sort = fac.Sort;
+
+                var articleFacility = _DbContext.Articles.Where(a => a.CategoryId == fac.Id && a.IsParent == true).FirstOrDefault();
+                itemResult.UrlImage = articleFacility.UrlImage;
+                itemResult.Summary = articleFacility.Summary;
+
+                var zCountry = new List<ArticleGroupDto>();
+                var zProvince = await (from c in _DbContext.Categories
+                                       join c0 in _DbContext.Categories on c.Parent equals c0.Id
+                                       join a in _DbContext.Articles on c.Id equals a.CategoryId
+                                       where c.RecordStatus != 99 && c0.RecordStatus != 99 && c0.Id == countryId && a.RecordStatus != 99
+                                       select c)
+                      .Distinct()
+                      .OrderBy(c => c.Sort)
+                      .ToListAsync();// get province
+
+                zCountry = _Mapper.Map<List<ArticleGroupDto>>(zProvince);
+                foreach (var item in zCountry)
+                {
+                    var zList = await (from a in _DbContext.Articles
+                                       join c in _DbContext.Categories on a.CategoryId equals c.Id
+                                       where a.RecordStatus != 99 && c.RecordStatus != 99 && a.Type == fac.Id && a.CategoryId == item.Id
+                                       select a)
+                      .Distinct()
+                      .OrderByDescending(a => a.CreatedOn)
+                      .ToListAsync();//get article
+
+                    item.Courses = _Mapper.Map<List<ArticleDto>>(zList);
+                }
+                itemResult.CourseGroup = zCountry;
+                result.Add(itemResult);
+            }    
+            
+            return result;
         }
         public async Task<List<ArticleGroupDto>> GetCourseByCountryIdAndTypeIDAsync(int typeId, int countryId)
         {

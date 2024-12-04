@@ -349,6 +349,19 @@ namespace HubbaGolf_Admin.Controllers
             }
         }
         [HttpGet]
+        public async Task<IActionResult> GetCourseGroupFacilityByCountryId(int id)
+        {
+            try
+            {
+                var zMenu = await _WebService.GetCourseGroupFacilityByCountryIdAsync(id);
+                return Ok(zMenu);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpGet]
         public async Task<IActionResult> GetCourseByCountryIdAndTypeID(int typeId, int countryId)
         {
             try

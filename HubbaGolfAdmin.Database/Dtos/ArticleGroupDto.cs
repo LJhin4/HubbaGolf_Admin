@@ -24,4 +24,16 @@ namespace HubbaGolfAdmin.Database.Dtos
         public string? Type { get; set; }
         public List<ArticleDto>? Courses { get; set; }
     }
+
+    public class ArticleFacilityDto
+    {
+        public int FacilityId { get; set; }
+
+        public string? FacilityName { get; set; }
+        public string? UrlImage { get; set; }
+        public string? Summary { get; set; }
+
+        public int? Sort { get; set; }
+        public List<ArticleGroupDto>? CourseGroup { get; set; }
+    }
 }
