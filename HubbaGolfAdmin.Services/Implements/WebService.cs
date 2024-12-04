@@ -343,32 +343,32 @@ namespace HubbaGolfAdmin.Services.Implements
             itemHome.link = "/";
             result.Add(itemHome);
 
-            var itemLocation = new MenuHeaderDto();
-            itemLocation.title = "Locations";
-            itemLocation.link = "#";
-            var subLocation = new List<ItemCountry>();
-            var zCountry = await _DbContext.Categories.Where(r => r.RecordStatus != 99 && r.Type == TypeMenu.Location && r.Parent == 0).OrderBy(r => r.Sort).ToListAsync();
-            foreach (var p in zCountry)
-            {
-                var zItem = new ItemCountry();
-                zItem.id = p.Id;
-                zItem.title = p.Name;
-                var lstProvince = new List<ItemProcince>();
+            //var itemLocation = new MenuHeaderDto();
+            //itemLocation.title = "Locations";
+            //itemLocation.link = "#";
+            //var subLocation = new List<ItemCountry>();
+            //var zCountry = await _DbContext.Categories.Where(r => r.RecordStatus != 99 && r.Type == TypeMenu.Location && r.Parent == 0).OrderBy(r => r.Sort).ToListAsync();
+            //foreach (var p in zCountry)
+            //{
+            //    var zItem = new ItemCountry();
+            //    zItem.id = p.Id;
+            //    zItem.title = p.Name;
+            //    var lstProvince = new List<ItemProcince>();
 
-                var zProvince = await _DbContext.Categories.Where(r => r.RecordStatus != 99 && r.Type == TypeMenu.Location && r.Parent == p.Id).OrderBy(r => r.Sort).ToListAsync();
-                foreach(var v in zProvince)
-                {
-                    var itemProvince = new ItemProcince();
-                    itemProvince.id = v.Id;
-                    itemProvince.name = v.Name;
-                    lstProvince.Add(itemProvince);
-                }
-                zItem.items = lstProvince;
-                subLocation.Add(zItem);
-            }
-            itemLocation.subMenu = subLocation;
+            //    var zProvince = await _DbContext.Categories.Where(r => r.RecordStatus != 99 && r.Type == TypeMenu.Location && r.Parent == p.Id).OrderBy(r => r.Sort).ToListAsync();
+            //    foreach(var v in zProvince)
+            //    {
+            //        var itemProvince = new ItemProcince();
+            //        itemProvince.id = v.Id;
+            //        itemProvince.name = v.Name;
+            //        lstProvince.Add(itemProvince);
+            //    }
+            //    zItem.items = lstProvince;
+            //    subLocation.Add(zItem);
+            //}
+            //itemLocation.subMenu = subLocation;
 
-            result.Add(itemLocation);
+            //result.Add(itemLocation);
 
             var itemCourses = new MenuHeaderDto();
             itemCourses.title = "Courses";
@@ -424,7 +424,7 @@ namespace HubbaGolfAdmin.Services.Implements
             result.Add(itemShop);
 
             var itemBook = new MenuHeaderDto();
-            itemBook.title = "Book";
+            itemBook.title = "Booking";
             itemBook.link = "/#form";
             result.Add(itemBook);
 
