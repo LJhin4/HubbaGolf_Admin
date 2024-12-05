@@ -144,6 +144,11 @@ namespace HubbaGolf_Admin.Controllers
             {
                 ViewBag.CategoryId = id;
             }
+            if(type != null)
+            {
+                ViewBag.SelectedTypeId = type;
+            }
+            ViewBag.StrSearch = value;
             ViewBag.SelectType = await _WebService.GetListCategoryByParentIdAsync(24);
             ViewBag.IsUseFac = false;
             var zFacility = await _WebService.GetListLocationAsync();
@@ -300,6 +305,7 @@ namespace HubbaGolf_Admin.Controllers
             }
         }
         [HttpPost]
+
         public async Task<IActionResult> ChangeStatusArticle(int id)
         {
             var result = await _WebService.ChangeStatusArticleAsync(id);

@@ -3,9 +3,19 @@
 @model List<ArticleDto>
 @{
     var _ListType = new List<CategoryDto>();
+    var _selectedTypeId = -1;
+    var _strSearch = "";
     if (ViewBag.SelectType != null)
     {
         _ListType = ViewBag.SelectType as List<CategoryDto>;
+    }
+    if (ViewBag.SelectedTypeId != null)
+    {
+        _selectedTypeId = ViewBag.SelectedTypeId;
+    }
+    if (ViewBag.StrSearch != null)
+    {
+        _strSearch = ViewBag.StrSearch;
     }
 }
 
@@ -28,11 +38,18 @@
                                 <div class="form-group">
                                     <select class="form-select select2" id="cbo_Type" name="type">
                                         <option value="">Choose...</option>
-                                        @{
-                                            foreach (var item in _ListType)
-                                            {
-                                                <option value="@item.Id">@item.Name</option>
-                                            }
+                                            @{
+                                                foreach (var item in _ListType)
+                                                {
+                                                    if (_selectedTypeId == item.Id)
+                                                    {
+                                                        <option value="@item.Id" selected>@item.Name</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@item.Id">@item.Name</option>
+                                                    }
+                                                }
                                         }
                                     </select>
                                 </div>
@@ -41,7 +58,7 @@
                     }
                     <div class="col">
                         <div class="input-group">
-                            <input class="form-control" placeholder="Search by title or summary..." type="text" id="txt_Search" name="value">
+                             <input class="form-control" placeholder="Search by title or summary..." type="text" id="txt_Search" name="value" value="@_strSearch">
                             <button type="submit" class="btn btn-primary">
                                 <span class="fa-fw select-all fas"></span>
                                 Search
@@ -79,9 +96,10 @@
                                 foreach (var item in Model)
                                 {
                                     <tr id="@item.Id">
-                                        <td style="width:7%">
+                                        @*<td style="width:7%">
                                             <input type="text" class="form-control" value="@item.Rank"/>
-                                        </td>
+                                        </td>*@
+                                        <td>@zNo</td>
                                         <td>@item.Title</td>
                                         <td>@item.Summary</td>
                                         <td>@item.Author</td>
@@ -102,6 +120,7 @@
                                             </a>
                                         </td>
                                     </tr>
+                                    zNo++;
                                 }
                             }
                         }

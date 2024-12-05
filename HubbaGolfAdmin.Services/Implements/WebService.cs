@@ -87,12 +87,26 @@ namespace HubbaGolfAdmin.Services.Implements
         }
         public async Task<List<ArticleDto>> GetListArticleByCategoryIdAsync(int categoryId)
         {
+            var zPrice = _DbContext.Pricings
+            .Where(p => p.RecordStatus != 99)
+            .ToDictionary(p => p.ArticleId, p => p.Price);
+
             var zListArticle = await _DbContext.Articles
                                         .Where(r => r.RecordStatus != 99 && r.CategoryId == categoryId && r.IsParent != true)
                                         .OrderBy(r => r.Rank)
                                         .ThenByDescending(r => r.CreatedOn)
                                         .ToListAsync();
-            return _Mapper.Map<List<ArticleDto>>(zListArticle);
+
+            var zListResult = _Mapper.Map<List<ArticleDto>>(zListArticle);
+            foreach (var article in zListResult)
+            {
+                if (zPrice.TryGetValue(article.Id, out var price))
+                {
+                    article.Price = price;
+                }
+            }
+
+            return zListResult;
         }
         public async Task<List<ArticleDto>> GetListArticleMenuTopTierAsync()
         {
@@ -155,6 +169,12 @@ namespace HubbaGolfAdmin.Services.Implements
             {
                 var zArticle = await _DbContext.Articles.FindAsync(id);
                 var zArticleDto = _Mapper.Map<ArticleDto>(zArticle);
+
+                var zPrice = _DbContext.Pricings
+                    .Where(p => p.RecordStatus != 99 && p.ArticleId == zArticle.Id).FirstOrDefault();
+
+                zArticleDto.Price = zPrice == null ? 0 : zPrice.Price;
+
                 //var zArticleDocument = await _DbContext.Documents.Where(r => r.ArticleId == id && r.RecordStatus != 99).ToListAsync();
                 //var zDocDto = new List<FileDto>();
                 //foreach (var item in zArticleDocument)
@@ -370,53 +390,54 @@ namespace HubbaGolfAdmin.Services.Implements
 
             //result.Add(itemLocation);
 
-            var itemCourses = new MenuHeaderDto();
-            itemCourses.title = "Courses";
-            itemCourses.link = "#";
+            //var itemCourses = new MenuHeaderDto();
+            //itemCourses.title = "Courses";
+            //itemCourses.link = "#";
 
-            var subCourse = new List<ItemCountry>();
-            var item1 = new ItemCountry();
-            item1.title = "Outdoors";
-            var lstitem1 = new List<ItemProcince>();
-            var iit1 = new ItemProcince();
-            iit1.id = 0;
-            iit1.name = "Singapore";
-            lstitem1.Add(iit1);
-            var iit2 = new ItemProcince();
-            iit2.id = 0;
-            iit2.name = "Malaysia";
-            lstitem1.Add(iit2);
-            var iit3 = new ItemProcince();
-            iit3.id = 0;
-            iit3.name = "Indonesia";
-            lstitem1.Add(iit3);
-            item1.items = lstitem1;
-            subCourse.Add(item1);
+            //var subCourse = new List<ItemCountry>();
+            //var item1 = new ItemCountry();
+            //item1.title = "Outdoors";
+            //var lstitem1 = new List<ItemProcince>();
+            //var iit1 = new ItemProcince();
+            //iit1.id = 0;
+            //iit1.name = "Singapore";
+            //lstitem1.Add(iit1);
+            //var iit2 = new ItemProcince();
+            //iit2.id = 0;
+            //iit2.name = "Malaysia";
+            //lstitem1.Add(iit2);
+            //var iit3 = new ItemProcince();
+            //iit3.id = 0;
+            //iit3.name = "Indonesia";
+            //lstitem1.Add(iit3);
+            //item1.items = lstitem1;
+            //subCourse.Add(item1);
 
-            var item2 = new ItemCountry();
-            item2.title = "Simulator";
-            var lstitem2 = new List<ItemProcince>();
-            var iit21 = new ItemProcince();
-            iit21.id = 0;
-            iit21.name = "Johor";
-            lstitem2.Add(iit21);
-            var iit22 = new ItemProcince();
-            iit22.id = 0;
-            iit22.name = "Kota Kinabalu";
-            lstitem2.Add(iit22);
-            var iit23 = new ItemProcince();
-            iit23.id = 0;
-            iit23.name = "Kuala Lumpur";
-            lstitem2.Add(iit23);
-            var iit24 = new ItemProcince();
-            iit24.id = 0;
-            iit24.name = "Kuching";
-            lstitem2.Add(iit24);
+            //var item2 = new ItemCountry();
+            //item2.title = "Simulator";
+            //var lstitem2 = new List<ItemProcince>();
+            //var iit21 = new ItemProcince();
+            //iit21.id = 0;
+            //iit21.name = "Johor";
+            //lstitem2.Add(iit21);
+            //var iit22 = new ItemProcince();
+            //iit22.id = 0;
+            //iit22.name = "Kota Kinabalu";
+            //lstitem2.Add(iit22);
+            //var iit23 = new ItemProcince();
+            //iit23.id = 0;
+            //iit23.name = "Kuala Lumpur";
+            //lstitem2.Add(iit23);
+            //var iit24 = new ItemProcince();
+            //iit24.id = 0;
+            //iit24.name = "Kuching";
+            //lstitem2.Add(iit24);
 
-            item2.items = lstitem2;
-            subCourse.Add(item2);
+            //item2.items = lstitem2;
+            //subCourse.Add(item2);
+            //itemCourses.subMenu = subCourse;
 
-            result.Add(itemCourses);
+            //result.Add(itemCourses);
 
             var itemShop = new MenuHeaderDto();
             itemShop.title = "Shop";
@@ -514,6 +535,10 @@ namespace HubbaGolfAdmin.Services.Implements
                   .OrderBy(c => c.Sort)
                   .ToListAsync();
 
+            var zPrice = _DbContext.Pricings
+                        .Where(p => p.RecordStatus != 99)
+                        .ToDictionary(p => p.ArticleId, p => p.Price);
+
             result = _Mapper.Map<List<ArticleGroupDto>>(zCategory);
             foreach(var item in result)
             {
@@ -524,7 +549,16 @@ namespace HubbaGolfAdmin.Services.Implements
                   .OrderByDescending(a => a.CreatedOn)
                   .ToListAsync();
 
-                item.Courses = _Mapper.Map<List<ArticleDto>>(zList);
+                var zListResult = _Mapper.Map<List<ArticleDto>>(zList);
+                foreach (var article in zListResult)
+                {
+                    if (zPrice.TryGetValue(article.Id, out var price))
+                    {
+                        article.Price = price;
+                    }
+                }
+
+                item.Courses = zListResult;
             }    
             return result;
         }
