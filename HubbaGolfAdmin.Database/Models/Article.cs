@@ -35,13 +35,29 @@ public partial class Article
 
     public string? Location { get; set; }
 
+    /// <summary>
+    /// 1: It&apos;s content for 4 container: course/package/simulator/shopping
+    /// </summary>
     public bool? IsParent { get; set; }
 
     public string? Description { get; set; }
 
     public DateTime? DateExp { get; set; }
 
+    /// <summary>
+    /// What type of article does the article belong to among the 4 types: course/simulator/shoping/package
+    /// </summary>
     public int? Type { get; set; }
+
+    /// <summary>
+    /// know which courses are in the package
+    /// </summary>
+    public string? Childs { get; set; }
+
+    /// <summary>
+    /// package schedule
+    /// </summary>
+    public string? Itinerary { get; set; }
 
     public int? RecordStatus { get; set; }
 

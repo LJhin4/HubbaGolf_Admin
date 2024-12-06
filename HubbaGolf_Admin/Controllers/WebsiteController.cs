@@ -163,7 +163,18 @@ namespace HubbaGolf_Admin.Controllers
         {
             var zArticle = await _WebService.GetArticleByIdAsync(id);
             ViewBag.SelectCategory = await _WebService.GetListAllCategoryAsync();
-            ViewBag.SelectType = await _WebService.GetListCategoryByParentIdAsync(24);
+            ViewBag.SelectType = await _WebService.GetListCategoryByParentIdAsync(24);//CategoryId = 24 - Facilities
+
+            if(zArticle != null && zArticle.Type == 27) //CategoryId = 27 - Golf Package
+            {
+                var zCountry = await _WebService.GetCategoryByIdAsync(zArticle.CategoryId.Value);
+                var zCourse = await _WebService.GetCourseByCountryIdAsync(zCountry.Parent.Value);
+                ViewBag.ListCourse = zCourse;
+            }
+            else
+            {
+                ViewBag.ListCourse = null;
+            }    
 
             var zCategoryId = HttpContext.Session.GetInt32("CategoryId");
             if (zCategoryId != null)

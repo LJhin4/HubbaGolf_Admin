@@ -32,5 +32,7 @@ namespace HubbaGolfAdmin.Database.Dtos
         public int? Rank { get; set; }
         public int? Type { get; set; }
         public decimal? Price { get; set; }
+        public string? Childs { get; set; }
+        public string? Itinerary { get; set; }
     }
 }

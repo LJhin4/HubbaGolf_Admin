@@ -124,6 +124,7 @@ namespace HubbaGolfAdmin.Database
                 entity.Property(e => e.Id).HasColumnName("ID");
                 entity.Property(e => e.Author).HasMaxLength(100);
                 entity.Property(e => e.CategoryId).HasColumnName("CategoryID");
+                entity.Property(e => e.Childs).HasComment("know which courses are in the package");
                 entity.Property(e => e.CreatedBy).HasMaxLength(50);
                 entity.Property(e => e.CreatedName).HasMaxLength(250);
                 entity.Property(e => e.CreatedOn).HasColumnType("datetime");
@@ -131,10 +132,13 @@ namespace HubbaGolfAdmin.Database
                 entity.Property(e => e.DateExp).HasColumnType("datetime");
                 entity.Property(e => e.Description).HasMaxLength(500);
                 entity.Property(e => e.Icon).HasMaxLength(250);
+                entity.Property(e => e.IsParent).HasComment("1: It's content for 4 container: course/package/simulator/shopping");
+                entity.Property(e => e.Itinerary).HasComment("package schedule");
                 entity.Property(e => e.MenuId).HasColumnName("MenuID");
                 entity.Property(e => e.ModifiedBy).HasMaxLength(50);
                 entity.Property(e => e.ModifiedName).HasMaxLength(250);
                 entity.Property(e => e.ModifiedOn).HasColumnType("datetime");
+                entity.Property(e => e.Type).HasComment("What type of article does the article belong to among the 4 types: course/simulator/shoping/package");
             });
 
             modelBuilder.Entity<Pricing>(entity =>

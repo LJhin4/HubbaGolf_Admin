@@ -1,4 +1,24 @@
-﻿FilePond.registerPlugin(
+﻿$(document).ready(function () {
+    $('#cbo_Type').on('change', function () {
+        const selectedValue = $(this).val();
+        const $listItem = $('#packageDetail');
+
+        if (selectedValue === "27") {
+            $listItem.show();
+        } else {
+            $listItem.hide();
+            tinymce.get("txt_Itinerary").setContent("");
+            $('#cbo_Childs').val([]).prop('selected', false);
+            $('#articleTab .nav-link').removeClass('active');
+            $('#articleTab .nav-link').first().addClass('active');
+
+            $('.tab-pane').removeClass('show active');
+            $('.tab-pane').first().addClass('show active');
+        }
+    });
+});
+
+FilePond.registerPlugin(
     FilePondPluginFileRename,
     FilePondPluginFileValidateSize,
     FilePondPluginFileValidateType,
@@ -131,6 +151,19 @@ $(function () {
 
         var contentVn = tinymce.get("txt_ContentVn").getContent(); // Ensure you have the correct ID
         $('#txt_ContentVn').val(contentVn);
+
+        var editor = tinymce.get("txt_Itinerary");
+
+        if (editor) {
+            var Itinerary = editor.getContent();
+            $('#txt_Itinerary').val(Itinerary);
+        }
+
+        const selectElement = document.getElementById("cbo_Childs");
+        const selectedValues = Array.from(selectElement.selectedOptions).map(option => option.value);
+        const joinedValues = selectedValues.join('|');
+
+        $('#txt_Childs').val(joinedValues);
 
         var Ok = Utils.checkRequired();
         if (Ok) {

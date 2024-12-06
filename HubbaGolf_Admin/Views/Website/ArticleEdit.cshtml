@@ -9,6 +9,12 @@
     var _ListCates = new List<CategoryDto>();
     var _ListParentCates = new List<CategoryDto>();
     var _ListType = new List<CategoryDto>();
+    var _ListCourse = new List<ArticleDto>();
+    var _ListCourseValue = new List<string>();
+    if (Model != null && Model.Childs != null && Model.Childs != "")
+    {
+        _ListCourseValue = Model.Childs.Split('|').ToList();
+    }
     if (ViewBag.SelectCategory != null)
     {
         _ListCates = ViewBag.SelectCategory as List<CategoryDto>;
@@ -17,6 +23,10 @@
     if (ViewBag.SelectType != null)
     {
         _ListType = ViewBag.SelectType as List<CategoryDto>;
+    }
+    if (ViewBag.ListCourse != null)
+    {
+        _ListCourse = ViewBag.ListCourse;
     }
 
     //The default is normal posts
@@ -63,14 +73,30 @@
                                        aria-controls="home"
                                        aria-selected="true">Detail</a>
                                 </li>
-                                @* <li class="nav-item" role="presentation">
-                                    <a class="nav-link" id="article-en-tab"
-                                       data-bs-toggle="tab"
-                                       href="#article-en"
-                                       role="tab"
-                                       aria-controls="home"
-                                       aria-selected="true">English</a>
-                                </li> *@
+                                @{
+                                    if (_ListCourse != null && _ListCourse.Count > 0)
+                                    {
+                                        <li class="nav-item" role="presentation" id="packageDetail">
+                                            <a class="nav-link" id="article-en-tab"
+                                               data-bs-toggle="tab"
+                                               href="#article-en"
+                                               role="tab"
+                                               aria-controls="home"
+                                               aria-selected="true">PackageDetail</a>
+                                        </li>
+                                    }
+                                    else
+                                    {
+                                        <li class="nav-item" role="presentation" id="packageDetail" style="display: none;">
+                                            <a class="nav-link" id="article-en-tab"
+                                               data-bs-toggle="tab"
+                                               href="#article-en"
+                                               role="tab"
+                                               aria-controls="home"
+                                               aria-selected="true">PackageDetail</a>
+                                        </li>
+                                    }
+                                }
                             </ul>
                             <div class="tab-content" id="articleTabContent">
 
@@ -99,9 +125,31 @@
                                 </div>
 
                                 <!--english-->
-                                @* <div class="tab-pane fade p-3 rounded bg-tab" id="article-en" role="tabpanel" aria-labelledby="article-en-tab">
-                                    
-                                </div> *@
+                                <div class="tab-pane fade p-3 rounded bg-tab" id="article-en" role="tabpanel" aria-labelledby="article-en-tab">
+                                    <div class="form-group">
+                                        <label for="txt_Itinerary">Itinerary</label>
+                                        <textarea id="txt_Itinerary" class="tiny-editor" rows="12" name="Itinerary">@Html.Raw(Model?.Itinerary ?? "")</textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="cbo_Childs">Courses</label>
+                                        <select class="form-select select2" id="cbo_Childs" name="cbo_Childs" multiple>
+                                            <option value="">Choose...</option>
+                                            @{
+                                                foreach (var item in _ListCourse)
+                                                {
+                                                    if (_ListCourseValue.Exists(value => value.Contains(item.Id.ToString())))
+                                                    {
+                                                        <option value="@item.Id" selected>@item.Title</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@item.Id">@item.Title</option>
+                                                    }
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="row" hidden>
@@ -272,6 +320,7 @@
             <input type="hidden" id="txt_TypeArticle" value="@_TypeArticle" />
             <input type="hidden" id="txt_HasImage" value="@Model?.UrlImage" />
             <input type="hidden" id="txt_Link" value="@Model?.Link" />
+            <input type="hidden" id="txt_Childs" name="Childs" value="@Model?.Childs" />
 
         </form>
     </section>
