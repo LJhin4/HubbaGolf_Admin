@@ -57,7 +57,7 @@ document.querySelectorAll(".tiny-editor").forEach(function (element) {
 const $filePond = FilePond.create(document.getElementById("txt_UrlImage"), {
     credits: null,
     allowImagePreview: true,
-    allowMultiple: false,
+    allowMultiple: true,
     allowFileEncode: false,
     required: false,
     storeAsFile: true,
@@ -66,6 +66,21 @@ const $filePond = FilePond.create(document.getElementById("txt_UrlImage"), {
     allowFileSizeValidation: true,
     acceptedFileTypes: ['image/*'],
 });
+
+if (stringUrlImage != null) {
+    const imageFiles = stringUrlImage.split('|');
+
+    imageFiles.forEach(image => {
+
+        if (image) {
+            $filePond.addFile(image).then(() => {
+                console.log(`${image} loaded successfully!`);
+            }).catch(error => {
+                console.log(`Failed to load ${image}:`, error);
+            });
+        }
+    });
+}
 
 FilePond.create(document.getElementById("txt_Icon"), {
     credits: null,

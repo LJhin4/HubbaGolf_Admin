@@ -191,6 +191,12 @@ namespace HubbaGolfAdmin.Services.Implements
                 //    });
                 //}
                 //zArticleDto.Documents = zDocDto;
+
+                if (!zArticleDto.UrlImage.IsNullOrEmpty())
+                {
+                    zArticleDto.lstUrlImage = zArticleDto.UrlImage.Split('|').ToList();
+                }    
+
                 return zArticleDto;
             }
 
@@ -557,6 +563,10 @@ namespace HubbaGolfAdmin.Services.Implements
                     {
                         article.Price = price;
                     }
+                    if(!article.UrlImage.IsNullOrEmpty())
+                    {
+                        article.UrlImage = article.UrlImage.Split('|')[0];
+                    }    
                 }
 
                 item.Courses = zListResult;

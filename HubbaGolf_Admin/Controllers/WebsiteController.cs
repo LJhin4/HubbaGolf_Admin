@@ -211,10 +211,16 @@ namespace HubbaGolf_Admin.Controllers
             try
             {
                 if (articleDto.FileImage != null &&
-                    articleDto.FileImage.Length > 0)
+                    articleDto.FileImage.Count > 0)
                 {
-                    var fileName = Guid.NewGuid().ToString() + "_" + articleDto.FileImage.FileName;
-                    articleDto.UrlImage = ViewHelper.UploadFile(articleDto.FileImage, _ImagePath);
+                    foreach(var fileImage in articleDto.FileImage)
+                    {
+                        if(fileImage != null && fileImage.Length > 0)
+                        {
+                            var fileName = Guid.NewGuid().ToString() + "_" + fileImage.FileName;
+                            articleDto.UrlImage += articleDto.UrlImage.IsNullOrEmpty() ? ViewHelper.UploadFile(fileImage, _ImagePath) : ( "|" + ViewHelper.UploadFile(fileImage, _ImagePath));
+                        }
+                    }
                 }
 
                 if (articleDto.FileIcon != null &&
@@ -428,11 +434,24 @@ namespace HubbaGolf_Admin.Controllers
         {
             articleDto.Status ??= 1;
 
+            //if (articleDto.FileImage != null &&
+            //    articleDto.FileImage.Length > 0)
+            //{
+            //    var fileName = Guid.NewGuid().ToString() + "_" + articleDto.FileImage.FileName;
+            //    articleDto.UrlImage = ViewHelper.UploadFile(articleDto.FileImage, _ImagePath); //Helper.UploadFile(articleDto.FileImage, fileName, _ImagePath);
+            //}
+
             if (articleDto.FileImage != null &&
-                articleDto.FileImage.Length > 0)
+                    articleDto.FileImage.Count > 0)
             {
-                var fileName = Guid.NewGuid().ToString() + "_" + articleDto.FileImage.FileName;
-                articleDto.UrlImage = ViewHelper.UploadFile(articleDto.FileImage, _ImagePath); //Helper.UploadFile(articleDto.FileImage, fileName, _ImagePath);
+                foreach (var fileImage in articleDto.FileImage)
+                {
+                    if (fileImage != null && fileImage.Length > 0)
+                    {
+                        var fileName = Guid.NewGuid().ToString() + "_" + fileImage.FileName;
+                        articleDto.UrlImage += articleDto.UrlImage.IsNullOrEmpty() ? ViewHelper.UploadFile(fileImage, _ImagePath) : ("|" + ViewHelper.UploadFile(fileImage, _ImagePath));
+                    }
+                }
             }
 
             var zRecord = await _WebService.SaveArticleHomepage(id, articleDto);

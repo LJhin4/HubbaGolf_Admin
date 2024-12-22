@@ -3,6 +3,7 @@
 @using HubbaGolfAdmin.Database.Models
 @using HubbaGolfAdmin.Services.Implements
 @using HubbaGolfAdmin.Shared
+@using Newtonsoft.Json;
 @inject EnvironmentService EnvService
 @model ArticleDto
 @{
@@ -183,28 +184,28 @@
                             <div class="form-group">
                                 <label for="txt_UrlImage" class="form-label">Avatar</label>
 
-                                @{
+                                @* @{
                                     if (Model != null && !string.IsNullOrEmpty(Model?.UrlImage))
                                     {
                                         var zSrc = Url.Content(EnvService.GetUrl(Model?.UrlImage));
                                         <img src="@Url.Content(zSrc)" class="w-100" />
                                     }
-                                }
+                                } *@
 
                                 <!-- File uploader -->
-                                <input type="file" id="txt_UrlImage" name="FileImage" class="basic-filepond" accept="image/jpeg, image/png, image/svg">
+                                <input type="file" id="txt_UrlImage" name="FileImage" class="basic-filepond" accept="image/jpeg, image/png, image/svg" multiple>
                             </div>
 
                             <div class="form-group" hidden>
                                 <label for="txt_Icon" class="form-label">Icon (if any)</label>
 
-                                @{
-                                    if (Model != null && !string.IsNullOrEmpty(Model?.Icon))
+                                @* @{
+                                    if (model != null && !string.isnullorempty(model?.icon))
                                     {
-                                        var zSrc = Url.Content(EnvService.GetUrl(Model?.Icon));
-                                        <img src="@Url.Content(zSrc)" class="w-100" />
+                                        var zsrc = url.content(envservice.geturl(model?.icon));
+                                        <img src="@url.content(zsrc)" class="w-100" />
                                     }
-                                }
+                                } *@
 
                                 <!-- File uploader -->
                                 <input type="file" id="txt_Icon" name="FileIcon" class="basic-filepond" accept="image/jpeg, image/png, image/svg">
@@ -337,4 +338,19 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="~/js/remove-all-diacritics.js"></script>
     <script src="~/js/page/articleedit.js" asp-append-version="true"></script>
+
 }
+
+@{
+    var fullImageUrls = string.IsNullOrEmpty(Model?.UrlImage)
+        ? new List<string>()
+        : Model.UrlImage
+            .Split('|', StringSplitOptions.RemoveEmptyEntries)
+            .Select(image => Url.Content(EnvService.GetUrl(image)))
+            .ToList();
+}
+<script>
+    var fullImageUrls = @Html.Raw(JsonConvert.SerializeObject(fullImageUrls));
+
+    var stringUrlImage = fullImageUrls.join('|');
+</script>

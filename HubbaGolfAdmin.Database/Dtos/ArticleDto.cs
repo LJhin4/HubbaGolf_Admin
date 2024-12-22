@@ -20,7 +20,7 @@ namespace HubbaGolfAdmin.Database.Dtos
         public string? Icon { get; set; }
         public IFormFile? FileIcon { get; set; }
         public string? UrlImage { get; set; }
-        public IFormFile? FileImage { get; set; }
+        public List<IFormFile>? FileImage { get; set; }
         public string? Description { get; set; }
         public string? Location { get; set; }
         public bool? IsParent { get; set; }
@@ -34,5 +34,6 @@ namespace HubbaGolfAdmin.Database.Dtos
         public decimal? Price { get; set; }
         public string? Childs { get; set; }
         public string? Itinerary { get; set; }
+        public List<string>? lstUrlImage { get; set; }
     }
 }
