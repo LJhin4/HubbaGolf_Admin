@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using HubbaGolfAdmin.Database.Models;
+using Microsoft.AspNetCore.Http;
 
 namespace HubbaGolfAdmin.Database.Dtos
 {
@@ -21,6 +22,8 @@ namespace HubbaGolfAdmin.Database.Dtos
         public IFormFile? FileIcon { get; set; }
         public string? UrlImage { get; set; }
         public IFormFile? FileImage { get; set; }
+        public List<ArticleMediaDto>? Media { get; set; }
+        public List<IFormFile>? FileMedia { get; set; }
         public string? Description { get; set; }
         public string? Location { get; set; }
         public bool? IsParent { get; set; }
@@ -34,5 +37,6 @@ namespace HubbaGolfAdmin.Database.Dtos
         public decimal? Price { get; set; }
         public string? Childs { get; set; }
         public string? Itinerary { get; set; }
+        public List<string>? lstUrlImage { get; set; }
     }
 }

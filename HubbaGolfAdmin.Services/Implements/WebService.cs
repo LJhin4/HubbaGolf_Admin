@@ -7,6 +7,7 @@ using HubbaGolfAdmin.Services.Interfaces;
 using HubbaGolfAdmin.Shared;
 using Microsoft.IdentityModel.Tokens;
 using System;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace HubbaGolfAdmin.Services.Implements
 {
@@ -139,6 +140,7 @@ namespace HubbaGolfAdmin.Services.Implements
 
         #endregion
 
+        #region Article
         public async Task<List<ArticleDto>> SearchArticle(int id, string value, int? type)
         {
             var zArticle = new List<Article>();
@@ -191,6 +193,12 @@ namespace HubbaGolfAdmin.Services.Implements
                 //    });
                 //}
                 //zArticleDto.Documents = zDocDto;
+
+                var zMedia = await _DbContext.ArticleMedia.Where(m => m.ArticleId == id && m.RecordStatus != 99).ToListAsync();
+                zArticleDto.Media = _Mapper.Map<List<ArticleMediaDto>>(zMedia);
+
+                zArticleDto.lstUrlImage = zMedia.Select(media => media.Url).ToList();
+
                 return zArticleDto;
             }
 
@@ -230,6 +238,7 @@ namespace HubbaGolfAdmin.Services.Implements
                         articleDto.NullToEmpty();
                         zArticle = _Mapper.Map(articleDto, zArticle);
                         _DbContext.Update(zArticle);
+
                     }
                     else
                     {
@@ -242,12 +251,31 @@ namespace HubbaGolfAdmin.Services.Implements
                     zArticle = _Mapper.Map(articleDto, new Article());
                     _DbContext.Add(zArticle);
                 }
-
-
                 //await _DbContext.UsersSysLogs.AddAsync(new UsersSysLog { InputInfo = articleDto.ToJson(), Product = "ARTICLE", RequestId = zArticle.Id.ToString() });
 
                 await _DbContext.SaveChangesAsync();
                 await transaction.CommitAsync();
+
+                var lstMedia = await _DbContext.ArticleMedia.Where(m => m.ArticleId == zArticle.Id && m.RecordStatus != 99).ToListAsync();
+                if (lstMedia != null && lstMedia.Count > 0)
+                {
+                    foreach (var item in lstMedia)
+                    {
+                        var zOldMedia = await _DbContext.ArticleMedia.FindAsync(item.Id);
+                        _DbContext.Remove(zOldMedia);
+                    }
+                }
+
+                if (articleDto.Media != null && articleDto.Media.Count > 0)
+                {
+                    foreach (var media in articleDto.Media)
+                    {
+                        media.ArticleId = zArticle.Id;
+                        var zMedia = _Mapper.Map(media, new ArticleMedium());
+                        _DbContext.Add(zMedia);
+                    }
+                }
+                await _DbContext.SaveChangesAsync();
 
                 // Return the ID of the inserted or updated article
                 return new Result<int>
@@ -320,6 +348,7 @@ namespace HubbaGolfAdmin.Services.Implements
                 };
             }
         }
+        #endregion
 
         public async Task<List<CountryDto>> GetAllLocationAsync()
         {
@@ -461,6 +490,8 @@ namespace HubbaGolfAdmin.Services.Implements
 
             return result;
         }
+
+        #region Course
         public async Task<List<ArticleDto>> GetCourseByCountryIdAsync(int id)
         {
             var zList = await (from a in _DbContext.Articles
@@ -563,6 +594,7 @@ namespace HubbaGolfAdmin.Services.Implements
             }    
             return result;
         }
+        #endregion
 
         #region [Manage Banner]
         public async Task<List<ArticleDto>> GetArticleHomepage(int id)

@@ -5,6 +5,7 @@ using HubbaGolfAdmin.Shared;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using HubbaGolfAdmin.Helpers;
+using HubbaGolfAdmin.Database.Models;
 
 namespace HubbaGolf_Admin.Controllers
 {
@@ -33,6 +34,7 @@ namespace HubbaGolf_Admin.Controllers
         {
             return View();
         }
+        #region Category
         public async Task<IActionResult> GetCategory()
         {
             _SessionStore.StoreCurrentUrl();
@@ -74,7 +76,9 @@ namespace HubbaGolf_Admin.Controllers
                 return BadRequest(ex);
             }
         }
+        #endregion
 
+        #region Location
         public async Task<IActionResult> GetLocation()
         {
             _SessionStore.StoreCurrentUrl();
@@ -92,20 +96,9 @@ namespace HubbaGolf_Admin.Controllers
             await _WebService.SaveCategory(id, categoryDto);
             return RedirectToAction(nameof(GetLocation));
         }
-        [HttpGet]
-        public async Task<IActionResult> GetAllLocation()
-        {
-            try
-            {
-                var zLocation = await _WebService.GetAllLocationAsync();
-                return Ok(zLocation);
-            }
-            catch(Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
+        #endregion
 
+        #region Article
         public async Task<IActionResult> GetListArticleByCategoryIdAdmin(int id)
         {
             _SessionStore.StoreCurrentUrl();
@@ -122,19 +115,6 @@ namespace HubbaGolf_Admin.Controllers
 
             HttpContext.Session.SetInt32("CategoryId", id);
             return View("~/Views/Website/ArticleList.cshtml", zList);
-        }
-        [HttpGet]
-        public async Task<IActionResult> GetListArticleByCategoryId(int id)
-        {
-            try
-            {
-                var zList = await _WebService.GetListArticleByCategoryIdAsync(id);
-                return Ok(zList);
-            }
-            catch(Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
         }
         public async Task<IActionResult> SearchArticle(int id, string value, int? type)
         {
@@ -191,20 +171,6 @@ namespace HubbaGolf_Admin.Controllers
             //    ViewBag.Log = await _WebService.GetArticleLogByIdAsync(id);
             return View("~/Views/Website/ArticleEdit.cshtml", zArticle);
         }
-        [HttpGet]
-        public async Task<IActionResult> GetArticleById(int id)
-        {
-            try
-            {
-                var zArticle = await _WebService.GetArticleByIdAsync(id);
-                return Ok(zArticle);
-            }
-            catch(Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }    
-        }
-
         [HttpPost]
         public async Task<IActionResult> SaveArticle(int id, ArticleDto articleDto)
         {
@@ -222,6 +188,26 @@ namespace HubbaGolf_Admin.Controllers
                 {
                     var fileName = Guid.NewGuid().ToString() + "_" + articleDto.FileIcon.FileName;
                     articleDto.Icon = ViewHelper.UploadFile(articleDto.FileIcon, _ImagePath);
+                }
+                if (articleDto.FileMedia != null &&
+                    articleDto.FileMedia.Count > 0)
+                {
+                    foreach (var fileMedia in articleDto.FileMedia)
+                    {
+                        if (fileMedia != null && fileMedia.Length > 0)
+                        {
+                            var zMedia = new ArticleMediaDto();
+                            zMedia.ArticleId = id;
+                            zMedia.Name = fileMedia.FileName;
+                            zMedia.Url = ViewHelper.UploadFile(fileMedia, _ImagePath);
+                            zMedia.Type = 1; // image
+                            if(articleDto.Media == null)
+                            {
+                                articleDto.Media = new List<ArticleMediaDto>();
+                            }
+                            articleDto.Media.Add(zMedia);
+                        }
+                    }
                 }
                 //HiddenStatus must be used to store the value of Publish
                 //Because the check status button is not stable, and if it is checked it is 1, if it is not checked it is null
@@ -316,7 +302,6 @@ namespace HubbaGolf_Admin.Controllers
             }
         }
         [HttpPost]
-
         public async Task<IActionResult> ChangeStatusArticle(int id)
         {
             var result = await _WebService.ChangeStatusArticleAsync(id);
@@ -326,6 +311,8 @@ namespace HubbaGolf_Admin.Controllers
             }
             return BadRequest("not found");
         }
+        #endregion
+
         public async Task<IActionResult> UpdateRank(int id, int rank)
         {
             if (id > 0)
@@ -338,71 +325,6 @@ namespace HubbaGolf_Admin.Controllers
             }
 
             return BadRequest();
-        }
-        [HttpGet]
-        public async Task<IActionResult> GetMenuHeader()
-        {
-            try
-            {
-                var zMenu = await _WebService.GetMenuHeaderAsync();
-                return Ok(zMenu);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-        [HttpGet]
-        public async Task<IActionResult> getCourseByCountryId(int id)
-        {
-            try
-            {
-                var zMenu = await _WebService.GetCourseByCountryIdAsync(id);
-                return Ok(zMenu);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-        [HttpGet]
-        public async Task<IActionResult> GetCourseGroupFacilityByCountryId(int id)
-        {
-            try
-            {
-                var zMenu = await _WebService.GetCourseGroupFacilityByCountryIdAsync(id);
-                return Ok(zMenu);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-        [HttpGet]
-        public async Task<IActionResult> GetCourseByCountryIdAndTypeID(int typeId, int countryId)
-        {
-            try
-            {
-                var zMenu = await _WebService.GetCourseByCountryIdAndTypeIDAsync(typeId, countryId);
-                return Ok(zMenu);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-        [HttpGet]
-        public async Task<IActionResult> GetListArticleMenuTopTier()
-        {
-            try
-            {
-                var zList = await _WebService.GetListArticleMenuTopTierAsync();
-                return Ok(zList);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
         }
 
         #region [Manage Banner]
@@ -458,15 +380,6 @@ namespace HubbaGolf_Admin.Controllers
             {
                 return BadRequest(ex);
             }
-        }
-        [HttpGet]
-        public async Task<IActionResult> GetBanner()
-        {
-            var zArticle = await _WebService.GetBanner();
-            if (zArticle != null)
-                return Ok(zArticle);
-            else
-                return BadRequest("not found");
         }
         #endregion
 
@@ -524,6 +437,134 @@ namespace HubbaGolf_Admin.Controllers
             else
                 return BadRequest("not found");
         }
+        #endregion
+
+
+        #region FE API
+
+        // In Manage Location
+        [HttpGet]
+        public async Task<IActionResult> GetAllLocation()
+        {
+            try
+            {
+                var zLocation = await _WebService.GetAllLocationAsync();
+                return Ok(zLocation);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        #region Article
+        [HttpGet]
+        public async Task<IActionResult> GetListArticleByCategoryId(int id)
+        {
+            try
+            {
+                var zList = await _WebService.GetListArticleByCategoryIdAsync(id);
+                return Ok(zList);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetArticleById(int id)
+        {
+            try
+            {
+                var zArticle = await _WebService.GetArticleByIdAsync(id);
+                return Ok(zArticle);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetListArticleMenuTopTier()
+        {
+            try
+            {
+                var zList = await _WebService.GetListArticleMenuTopTierAsync();
+                return Ok(zList);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        #endregion
+
+        [HttpGet]
+        public async Task<IActionResult> GetMenuHeader()
+        {
+            try
+            {
+                var zMenu = await _WebService.GetMenuHeaderAsync();
+                return Ok(zMenu);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        #region Course
+        [HttpGet]
+        public async Task<IActionResult> getCourseByCountryId(int id)
+        {
+            try
+            {
+                var zMenu = await _WebService.GetCourseByCountryIdAsync(id);
+                return Ok(zMenu);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetCourseGroupFacilityByCountryId(int id)
+        {
+            try
+            {
+                var zMenu = await _WebService.GetCourseGroupFacilityByCountryIdAsync(id);
+                return Ok(zMenu);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetCourseByCountryIdAndTypeID(int typeId, int countryId)
+        {
+            try
+            {
+                var zMenu = await _WebService.GetCourseByCountryIdAndTypeIDAsync(typeId, countryId);
+                return Ok(zMenu);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        #endregion
+
+        [HttpGet]
+        public async Task<IActionResult> GetBanner()
+        {
+            var zArticle = await _WebService.GetBanner();
+            if (zArticle != null)
+                return Ok(zArticle);
+            else
+                return BadRequest("not found");
+        }
+
         #endregion
     }
 }

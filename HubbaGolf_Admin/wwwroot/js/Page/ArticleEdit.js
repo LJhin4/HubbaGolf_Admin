@@ -80,6 +80,31 @@ FilePond.create(document.getElementById("txt_Icon"), {
     acceptedFileTypes: ['image/*'],
 });
 
+const $fileMedia = FilePond.create(document.getElementById("txt_Media"), {
+    credits: null,
+    allowImagePreview: true,
+    allowMultiple: true,
+    allowFileEncode: false,
+    required: false,
+    storeAsFile: true,
+    maxFileSize: '5MB',
+    maxTotalFileSize: '50MB',
+    allowFileSizeValidation: true,
+    acceptedFileTypes: ['image/*'],
+});
+
+if (lstUrl != null) {
+    lstUrl.forEach(url => {
+        if (url) {
+            $fileMedia.addFile(url).then(() => {
+                console.log(`${url} load success`);
+            }).catch(error => {
+                console.log(`${url} load failed`, error);
+            });
+        }
+    });
+}
+
 document.querySelectorAll(".multiple-files-filepond").forEach(function (element) {
     FilePond.create(element, {
         credits: null,

@@ -3,6 +3,7 @@
 @using HubbaGolfAdmin.Database.Models
 @using HubbaGolfAdmin.Services.Implements
 @using HubbaGolfAdmin.Shared
+@using Newtonsoft.Json
 @inject EnvironmentService EnvService
 @model ArticleDto
 @{
@@ -211,6 +212,13 @@
                             </div>
 
                             <div class="form-group">
+                                <label for="txt_Media" class="form-label">Media (if any)</label>
+
+                                <!-- File uploader -->
+                                <input type="file" id="txt_Media" name="FileMedia" class="basic-filepond" accept="image/jpeg, image/png, image/svg" multiple>
+                            </div>
+
+                            <div class="form-group">
                                 <label for="cbo_Type">Facilities</label>
                                 <select class="form-select select2" id="cbo_Type" name="Type">
                                     <option value="">Choose...</option>
@@ -338,3 +346,17 @@
     <script src="~/js/remove-all-diacritics.js"></script>
     <script src="~/js/page/articleedit.js" asp-append-version="true"></script>
 }
+
+<script>
+    var originalModel = @Html.Raw(JsonConvert.SerializeObject(@Model, new JsonSerializerSettings
+                   {
+                       ContractResolver = new Newtonsoft.Json.Serialization.DefaultContractResolver()
+                   }));
+
+    var lstUrl = null;
+    if(originalModel != null && originalModel.Media != null)
+    {
+        lstUrl = originalModel.Media.map(media => media.Url);
+    }
+
+</script>

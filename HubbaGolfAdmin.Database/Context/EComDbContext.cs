@@ -23,6 +23,7 @@ namespace HubbaGolfAdmin.Database
         public virtual DbSet<Category> Categories { get; set; }
         public virtual DbSet<Article> Articles { get; set; }
         public virtual DbSet<Pricing> Pricings { get; set; }
+        public virtual DbSet<ArticleMedium> ArticleMedia { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -158,6 +159,20 @@ namespace HubbaGolfAdmin.Database
                 entity.Property(e => e.Price).HasColumnType("decimal(19, 2)");
                 entity.Property(e => e.PricingType).HasMaxLength(250);
                 entity.Property(e => e.SpecificDate).HasColumnType("datetime");
+            });
+
+            modelBuilder.Entity<ArticleMedium>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("PK_ArticleImage");
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.ArticleId).HasColumnName("ArticleID");
+                entity.Property(e => e.CreatedBy).HasMaxLength(250);
+                entity.Property(e => e.CreatedName).HasMaxLength(250);
+                entity.Property(e => e.CreatedOn).HasColumnType("datetime");
+                entity.Property(e => e.ModifiedBy).HasMaxLength(50);
+                entity.Property(e => e.ModifiedName).HasMaxLength(250);
+                entity.Property(e => e.ModifiedOn).HasColumnType("datetime");
             });
 
             OnModelCreatingPartial(modelBuilder);

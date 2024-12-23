@@ -51,12 +51,12 @@ if (!app.Environment.IsDevelopment())
 //app.UseSwagger();
 //app.UseSwaggerUI();
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseSession();
 
 //check login
-app.UseMiddleware<AuthenMiddleware>();
+//app.UseMiddleware<AuthenMiddleware>();
 
 app.UseRouting();
 
