@@ -191,12 +191,6 @@ namespace HubbaGolfAdmin.Services.Implements
                 //    });
                 //}
                 //zArticleDto.Documents = zDocDto;
-
-                if (!zArticleDto.UrlImage.IsNullOrEmpty())
-                {
-                    zArticleDto.lstUrlImage = zArticleDto.UrlImage.Split('|').ToList();
-                }    
-
                 return zArticleDto;
             }
 
@@ -552,7 +546,8 @@ namespace HubbaGolfAdmin.Services.Implements
                                    join c in _DbContext.Categories on a.CategoryId equals c.Id
                                    where a.RecordStatus != 99 && c.RecordStatus != 99 && a.Type == typeId && a.CategoryId == item.Id
                                    select a)
-                  .OrderByDescending(a => a.CreatedOn)
+                  .OrderBy(a => a.Rank)
+                  .ThenByDescending(a => a.CreatedOn)
                   .ToListAsync();
 
                 var zListResult = _Mapper.Map<List<ArticleDto>>(zList);
@@ -562,10 +557,6 @@ namespace HubbaGolfAdmin.Services.Implements
                     {
                         article.Price = price;
                     }
-                    if(!article.UrlImage.IsNullOrEmpty())
-                    {
-                        article.UrlImage = article.UrlImage.Split('|')[0];
-                    }    
                 }
 
                 item.Courses = zListResult;
