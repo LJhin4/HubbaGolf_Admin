@@ -76,7 +76,7 @@ var Utils = {
     baseUrl: function (url) {
         // Check if the current environment is not local
         if (window.location.hostname !== 'localhost') {
-            var baseUrl = "" + url;
+            var baseUrl = "/admin" + url;
             return baseUrl;
         }
 

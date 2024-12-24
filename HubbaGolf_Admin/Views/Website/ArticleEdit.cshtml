@@ -356,7 +356,10 @@
     var lstUrl = null;
     if(originalModel != null && originalModel.Media != null)
     {
-        lstUrl = originalModel.Media.map(media => media.Url);
+        lstUrl = originalModel.Media.map(media => {
+            const url = `@Url.Content(EnvService.GetUrl("PLACEHOLDER"))`;
+            return url.replace("PLACEHOLDER", media.Url);
+        });
     }
 
 </script>

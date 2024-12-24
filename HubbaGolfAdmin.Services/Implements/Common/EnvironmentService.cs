@@ -20,7 +20,7 @@ namespace HubbaGolfAdmin.Services.Implements
                 return string.Empty;
             }
             var env = _hostingEnvironment.HostingEnvironment;
-            return env.EnvironmentName != "Development" ? "" + relativePath : relativePath;
+            return env.EnvironmentName != "Development" ? "/admin" + relativePath : relativePath;
         }
 
         public string GetApiUrl(string relativePath)
