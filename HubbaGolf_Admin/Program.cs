@@ -10,11 +10,20 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddCustomServices(builder.Configuration);
 
 //Cors
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy("AllowAllOrigins", policy =>
+//    {
+//        policy.AllowAnyOrigin()
+//              .AllowAnyHeader()
+//              .AllowAnyMethod();
+//    });
+//});
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAllOrigins", policy =>
+    options.AddPolicy("AllowSpecificOrigins", policy =>
     {
-        policy.AllowAnyOrigin()
+        policy.WithOrigins("http://hubbagolf.aevistrack.com", "https://hubbagolf.aevistrack.com", "http://localhost:8001")
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
@@ -30,7 +39,8 @@ builder.Host.ConfigureAppConfiguration((hostingContext, config) =>
 
 var app = builder.Build();
 
-app.UseCors("AllowAllOrigins");
+//app.UseCors("AllowAllOrigins");
+app.UseCors("AllowSpecificOrigins");
 // Configure the HTTP request pipeline.
 //if (!app.Environment.IsDevelopment())
 //{
@@ -39,12 +49,12 @@ app.UseCors("AllowAllOrigins");
 //    app.UseHsts();
 //}
 
-//app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseSession();
 
 //check login
-//app.UseMiddleware<AuthenMiddleware>();
+app.UseMiddleware<AuthenMiddleware>();
 
 app.UseRouting();
 
