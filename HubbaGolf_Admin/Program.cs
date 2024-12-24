@@ -28,28 +28,16 @@ builder.Host.ConfigureAppConfiguration((hostingContext, config) =>
     config.AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
 });
 
-//builder.Services.AddEndpointsApiExplorer();
-//builder.Services.AddSwaggerGen(options =>
-//{
-//    options.DocInclusionPredicate((_, api) =>
-//    {
-//        return api.ActionDescriptor.EndpointMetadata
-//                   .OfType<Microsoft.AspNetCore.Mvc.Routing.HttpMethodAttribute>()
-//                   .Any();
-//    });
-//});
 var app = builder.Build();
 
 app.UseCors("AllowAllOrigins");
 // Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
-}
-//app.UseSwagger();
-//app.UseSwaggerUI();
+//if (!app.Environment.IsDevelopment())
+//{
+//    app.UseExceptionHandler("/Home/Error");
+//    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+//    app.UseHsts();
+//}
 
 //app.UseHttpsRedirection();
 app.UseStaticFiles();
